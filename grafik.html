@@ -12,6 +12,8 @@
         }
     </script>
     
+    <!-- FIREBASE MODULE -->
+    <script type="module" src="data.js"></script>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -60,11 +62,6 @@
             color: #F18F01;
         }
         
-        .stat-box .unit {
-            font-size: 14px;
-            color: #666;
-        }
-        
         .chart-container {
             background: white;
             border-radius: 25px;
@@ -98,6 +95,45 @@
             display: inline-block;
             margin-top: 15px;
         }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            background: #E2E8F0;
+            border: 2px solid #0F4C5C;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 24px;
+            color: #0F4C5C;
+            font-weight: bold;
+        }
+        
+        .page-title {
+            color: #0F4C5C;
+            font-size: 22px;
+            font-weight: 600;
+            flex: 1;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 18px;
+            border-top: 2px solid #CBD5E0;
+            color: #4A5568;
+            font-size: 15px;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -115,12 +151,16 @@
         </div>
     </div>
     
-    <script type="module" src="data.js"></script>
+    <script src="data.js"></script>
     <script>
+        let barangChart = null;
+        let kategoriChart = null;
+        let hargaChart = null;
+
         function tampilkanStatistik() {
             const container = document.getElementById('statsContainer');
             
-            if (daftarBarang.length === 0) {
+            if (!window.daftarBarang || window.daftarBarang.length === 0) {
                 container.innerHTML = `
                     <div class="empty-data">
                         <p style="font-size: 48px;">📊</p>
@@ -133,12 +173,12 @@
             }
             
             // HITUNG STATISTIK
-            const totalBarang = daftarBarang.length;
-            const totalPengeluaran = daftarBarang.reduce((sum, b) => sum + b.modal, 0);
+            const totalBarang = window.daftarBarang.length;
+            const totalPengeluaran = window.daftarBarang.reduce((sum, b) => sum + (b.modal || 0), 0);
             
             // Barang paling sering dibeli
             const freq = {};
-            daftarBarang.forEach(b => {
+            window.daftarBarang.forEach(b => {
                 freq[b.nama] = (freq[b.nama] || 0) + 1;
             });
             
@@ -147,14 +187,14 @@
             
             // Pengeluaran per kategori
             const kategoriTotal = {};
-            daftarBarang.forEach(b => {
+            window.daftarBarang.forEach(b => {
                 const kat = b.kategori || 'Lainnya';
-                kategoriTotal[kat] = (kategoriTotal[kat] || 0) + b.modal;
+                kategoriTotal[kat] = (kategoriTotal[kat] || 0) + (b.modal || 0);
             });
             
             // Agen paling sering
             const agenFreq = {};
-            daftarBarang.forEach(b => {
+            window.daftarBarang.forEach(b => {
                 if (b.agen && b.agen !== '-') {
                     agenFreq[b.agen] = (agenFreq[b.agen] || 0) + 1;
                 }
@@ -215,8 +255,14 @@
             
             container.innerHTML = html;
             
+            // Hapus chart lama kalau ada
+            if (barangChart) barangChart.destroy();
+            if (kategoriChart) kategoriChart.destroy();
+            if (hargaChart) hargaChart.destroy();
+            
             // Grafik Barang
-            new Chart(document.getElementById('barangChart'), {
+            const ctxBarang = document.getElementById('barangChart').getContext('2d');
+            barangChart = new Chart(ctxBarang, {
                 type: 'bar',
                 data: {
                     labels: topBarang.map(b => b[0]),
@@ -238,7 +284,8 @@
             
             // Grafik Kategori
             const kategoriData = Object.entries(kategoriTotal).slice(0, 5);
-            new Chart(document.getElementById('kategoriChart'), {
+            const ctxKategori = document.getElementById('kategoriChart').getContext('2d');
+            kategoriChart = new Chart(ctxKategori, {
                 type: 'doughnut',
                 data: {
                     labels: kategoriData.map(k => k[0]),
@@ -262,12 +309,13 @@
             });
             
             // Grafik Tren Harga
-            const hargaData = daftarBarang.slice(-10).map(b => ({
+            const hargaData = window.daftarBarang.slice(-10).map(b => ({
                 tanggal: new Date(b.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
-                harga: b.modal / b.jumlahAngka
+                harga: (b.modal || 0) / (b.jumlahAngka || 1)
             }));
             
-            new Chart(document.getElementById('hargaChart'), {
+            const ctxHarga = document.getElementById('hargaChart').getContext('2d');
+            hargaChart = new Chart(ctxHarga, {
                 type: 'line',
                 data: {
                     labels: hargaData.map(h => h.tanggal),
@@ -295,10 +343,33 @@
         }
         
         function formatRupiah(angka) {
+            if (!angka) return 'Rp 0';
             return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
         }
+
+        // ==================== REAL-TIME LISTENER ====================
+        function setupRealtimeListener() {
+            if (window.subscribeToBarang) {
+                window.subscribeToBarang(function(data) {
+                    console.log('🔄 Data barang berubah, refresh grafik');
+                    tampilkanStatistik();
+                });
+            } else {
+                // Fallback polling
+                setInterval(() => {
+                    if (window.daftarBarang) {
+                        tampilkanStatistik();
+                    }
+                }, 3000);
+            }
+        }
         
-        document.addEventListener('DOMContentLoaded', tampilkanStatistik);
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                tampilkanStatistik();
+                setupRealtimeListener();
+            }, 500);
+        });
     </script>
 </body>
 </html>
