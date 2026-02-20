@@ -12,6 +12,9 @@
         }
     </script>
     
+    <!-- FIREBASE MODULE -->
+    <script type="module" src="data.js"></script>
+    
     <link rel="stylesheet" href="style.css">
     <style>
         .kategori-list {
@@ -130,6 +133,67 @@
             margin-bottom: 15px;
             border: 2px solid #0F4C5C;
         }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            background: #E2E8F0;
+            border: 2px solid #0F4C5C;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 24px;
+            color: #0F4C5C;
+            font-weight: bold;
+        }
+        
+        .page-title {
+            color: #0F4C5C;
+            font-size: 22px;
+            font-weight: 600;
+            flex: 1;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 18px;
+            border-top: 2px solid #CBD5E0;
+            color: #4A5568;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .success-message {
+            background: #C6F6D5;
+            color: #22543D;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .error-message {
+            background: #FEEBC8;
+            color: #7B341E;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -139,6 +203,10 @@
             <h1 class="page-title">🏷️ KELOLA KATEGORI</h1>
             <div style="width: 45px;"></div>
         </div>
+
+        <!-- PESAN -->
+        <div id="successMessage" class="success-message"></div>
+        <div id="errorMessage" class="error-message"></div>
 
         <!-- TOMBOL REFRESH -->
         <button class="btn-refresh" onclick="refreshKategori()">🔄 Refresh Kategori</button>
@@ -163,16 +231,33 @@
         </div>
     </div>
 
-    <script type="module" src="data.js"></script>
+    <script src="data.js"></script>
     <script>
+        // ==================== FUNGSI TAMPILAN PESAN ====================
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+        
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+
+        // ==================== FUNGSI UTAMA ====================
+
         // PASTIKAN daftarKategori ADA
         if (!window.daftarKategori) {
             window.daftarKategori = [
                 "Sembako",
-                "Makanan & Minuman Kemasan",
-                "Frozen Food & Ice Cream",
-                "Rokok & Obat-obatan",
-                "Perlampuan & RT",
+                "Makanan",
+                "Frozen Food",
+                "Rokok",
+                "RT",
                 "Lainnya"
             ];
         }
@@ -186,7 +271,7 @@
         function tampilkanKategori() {
             const container = document.getElementById('kategoriContainer');
             
-            if (!daftarKategori || daftarKategori.length === 0) {
+            if (!window.daftarKategori || window.daftarKategori.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <p style="font-size: 48px;">🏷️</p>
@@ -198,9 +283,9 @@
             }
             
             let html = '';
-            daftarKategori.forEach((kat, index) => {
+            window.daftarKategori.forEach((kat, index) => {
                 // Hitung jumlah barang di kategori ini
-                const jumlahBarang = daftarBarang ? daftarBarang.filter(b => b.kategori === kat).length : 0;
+                const jumlahBarang = window.daftarBarang ? window.daftarBarang.filter(b => b.kategori === kat).length : 0;
                 
                 html += `
                     <div class="kategori-item">
@@ -225,68 +310,64 @@
             const nama = input.value.trim();
             
             if (!nama) {
-                alert('⚠️ Nama kategori tidak boleh kosong');
+                showError('⚠️ Nama kategori tidak boleh kosong');
                 input.focus();
                 return;
             }
             
             // Cek duplikat
-            if (daftarKategori.includes(nama)) {
-                alert('⚠️ Kategori "' + nama + '" sudah ada');
+            if (window.daftarKategori.includes(nama)) {
+                showError('⚠️ Kategori "' + nama + '" sudah ada');
                 input.value = '';
                 return;
             }
             
             // Tambah ke array
-            daftarKategori.push(nama);
+            window.daftarKategori.push(nama);
             
             // Simpan ke localStorage (backup)
             try {
-                localStorage.setItem('tokofariz_kategori', JSON.stringify(daftarKategori));
-            } catch (e) {
-                console.log('Gagal simpan ke localStorage');
-            }
+                localStorage.setItem('tokofariz_kategori', JSON.stringify(window.daftarKategori));
+            } catch (e) {}
             
             // Update tampilan
             tampilkanKategori();
             input.value = '';
-            
-            // Kasih pesan sukses
-            alert('✅ Kategori "' + nama + '" berhasil ditambahkan');
+            showSuccess('✅ Kategori "' + nama + '" berhasil ditambahkan');
         }
         
         // EDIT KATEGORI
         function editKategori(index) {
-            const kategoriLama = daftarKategori[index];
+            const kategoriLama = window.daftarKategori[index];
             const baru = prompt('Ubah nama kategori:', kategoriLama);
             
             if (baru && baru.trim()) {
                 const namaBaru = baru.trim();
                 
                 // Cek duplikat
-                if (daftarKategori.includes(namaBaru) && namaBaru !== kategoriLama) {
-                    alert('⚠️ Kategori "' + namaBaru + '" sudah ada');
+                if (window.daftarKategori.includes(namaBaru) && namaBaru !== kategoriLama) {
+                    showError('⚠️ Kategori "' + namaBaru + '" sudah ada');
                     return;
                 }
                 
-                daftarKategori[index] = namaBaru;
+                window.daftarKategori[index] = namaBaru;
                 
                 // Simpan ke localStorage
                 try {
-                    localStorage.setItem('tokofariz_kategori', JSON.stringify(daftarKategori));
+                    localStorage.setItem('tokofariz_kategori', JSON.stringify(window.daftarKategori));
                 } catch (e) {}
                 
                 tampilkanKategori();
-                alert('✅ Kategori berhasil diubah');
+                showSuccess('✅ Kategori berhasil diubah');
             }
         }
         
         // HAPUS KATEGORI
         function hapusKategori(index) {
-            const kategori = daftarKategori[index];
+            const kategori = window.daftarKategori[index];
             
             // Cek apakah kategori digunakan
-            const jumlahBarang = daftarBarang ? daftarBarang.filter(b => b.kategori === kategori).length : 0;
+            const jumlahBarang = window.daftarBarang ? window.daftarBarang.filter(b => b.kategori === kategori).length : 0;
             
             let pesan = `Hapus kategori "${kategori}"?`;
             if (jumlahBarang > 0) {
@@ -297,31 +378,42 @@
                 return;
             }
             
-            daftarKategori.splice(index, 1);
+            window.daftarKategori.splice(index, 1);
             
             // Simpan ke localStorage
             try {
-                localStorage.setItem('tokofariz_kategori', JSON.stringify(daftarKategori));
+                localStorage.setItem('tokofariz_kategori', JSON.stringify(window.daftarKategori));
             } catch (e) {}
             
             tampilkanKategori();
-            alert('✅ Kategori berhasil dihapus');
+            showSuccess('✅ Kategori berhasil dihapus');
         }
 
-        // INIT
+        // ==================== REAL-TIME LISTENER ====================
+        function setupRealtimeListener() {
+            if (window.subscribeToBarang) {
+                window.subscribeToBarang(function(data) {
+                    console.log('🔄 Data barang berubah, refresh kategori');
+                    tampilkanKategori();
+                });
+            }
+        }
+
+        // ==================== INIT ====================
         document.addEventListener('DOMContentLoaded', function() {
-            // Load kategori dari localStorage kalau ada
+            // Load kategori dari localStorage
             try {
                 const saved = localStorage.getItem('tokofariz_kategori');
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     if (Array.isArray(parsed) && parsed.length > 0) {
-                        daftarKategori = parsed;
+                        window.daftarKategori = parsed;
                     }
                 }
             } catch (e) {}
             
             tampilkanKategori();
+            setupRealtimeListener();
             
             // Enter untuk tambah
             document.getElementById('namaKategoriBaru').addEventListener('keypress', function(e) {
