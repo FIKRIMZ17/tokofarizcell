@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>🔍 Cek Harga - TOKO FARIZ CELL</title>
+    
+    <!-- CEK LOGIN -->
+    <script>
+        if (localStorage.getItem('tokofariz_auth') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+    
+    <!-- FIREBASE MODULE -->
+    <script type="module" src="data.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
         .search-box-page {
@@ -66,6 +76,19 @@
             background: #E6F0FA;
         }
         
+        .suggestion-nama {
+            font-weight: bold;
+            color: #0F4C5C;
+        }
+        
+        .suggestion-kategori {
+            font-size: 12px;
+            color: #F18F01;
+            background: #FEF5E7;
+            padding: 3px 10px;
+            border-radius: 30px;
+        }
+        
         .filter-section {
             display: flex;
             gap: 10px;
@@ -107,7 +130,6 @@
             position: relative;
         }
         
-        /* BARIS PERTAMA: Nama dan Kategori */
         .product-row-1 {
             display: flex;
             justify-content: space-between;
@@ -130,7 +152,6 @@
             font-size: 11px;
         }
         
-        /* BARIS KEDUA: Harga dan Aksi (SEJAJAR) */
         .product-row-2 {
             display: flex;
             align-items: center;
@@ -138,7 +159,6 @@
             gap: 10px;
         }
         
-        /* Harga Ecer (Kiri) */
         .harga-ecer-box {
             flex: 1;
             min-width: 100px;
@@ -155,7 +175,6 @@
             color: #666;
         }
         
-        /* Harga Grosir (Tengah) */
         .harga-grosir-box {
             flex: 1;
             min-width: 100px;
@@ -167,7 +186,6 @@
             color: #F18F01;
         }
         
-        /* Indikator + Keranjang (Kanan) */
         .aksi-box {
             display: flex;
             align-items: center;
@@ -240,7 +258,6 @@
             border: 2px solid white;
         }
         
-        /* BARIS KETIGA: Tanggal dan Agen */
         .product-row-3 {
             display: flex;
             gap: 15px;
@@ -251,7 +268,6 @@
             color: #999;
         }
         
-        /* HISTORY POPUP */
         .history-popup {
             position: absolute;
             top: 100%;
@@ -335,6 +351,44 @@
             z-index: 1000;
         }
         
+        .cart-summary-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .cart-summary-icon {
+            background: #F18F01;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        
+        .cart-summary-info h3 {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .cart-summary-info p {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .cart-summary-right button {
+            background: #F18F01;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -372,6 +426,141 @@
             transform: scale(1);
         }
         
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #CBD5E0;
+        }
+        
+        .modal-header-icon {
+            background: #0F4C5C;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .modal-header h2 {
+            color: #0F4C5C;
+            font-size: 22px;
+            flex: 1;
+        }
+        
+        .modal-product-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0F4C5C;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .modal-price {
+            background: #FEF5E7;
+            padding: 15px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px solid #F18F01;
+        }
+        
+        .modal-price .label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .modal-price .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #F18F01;
+        }
+        
+        .modal-input-group {
+            margin-bottom: 25px;
+        }
+        
+        .modal-input-group label {
+            display: block;
+            font-weight: bold;
+            color: #0F4C5C;
+            margin-bottom: 8px;
+        }
+        
+        .modal-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-input input {
+            flex: 1;
+            padding: 15px;
+            font-size: 20px;
+            border: 3px solid #CBD5E0;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .modal-input input:focus {
+            border-color: #F18F01;
+            outline: none;
+        }
+        
+        .modal-input span {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0F4C5C;
+            min-width: 60px;
+        }
+        
+        .modal-total {
+            background: #E6F0FA;
+            padding: 15px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-weight: bold;
+            border: 2px solid #0F4C5C;
+        }
+        
+        .modal-total span:last-child {
+            color: #F18F01;
+            font-size: 22px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .modal-btn.cancel {
+            background: #E2E8F0;
+            color: #666;
+        }
+        
+        .modal-btn.add {
+            background: #1E7A5E;
+            color: white;
+        }
+        
         .no-result {
             text-align: center;
             padding: 40px;
@@ -380,13 +569,33 @@
             color: #666;
         }
         
-        @media (max-width: 500px) {
-            .product-row-2 {
-                flex-wrap: wrap;
-            }
-            .harga-ecer-box, .harga-grosir-box {
-                min-width: 80px;
-            }
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            background: #E2E8F0;
+            border: 2px solid #0F4C5C;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 24px;
+            color: #0F4C5C;
+            font-weight: bold;
+        }
+        
+        .page-title {
+            color: #0F4C5C;
+            font-size: 22px;
+            font-weight: 600;
+            flex: 1;
         }
     </style>
 </head>
@@ -430,11 +639,14 @@
                 <div class="modal-header-icon">🛒</div>
                 <h2>Tambah ke Belanja</h2>
             </div>
+            
             <div id="modalProductName" class="modal-product-name">-</div>
+            
             <div class="modal-price">
                 <div class="label">Harga Grosir</div>
                 <div class="value" id="modalHargaGrosir">Rp 0</div>
             </div>
+            
             <div class="modal-input-group">
                 <label>Jumlah beli</label>
                 <div class="modal-input">
@@ -442,10 +654,12 @@
                     <span id="modalSatuan">pcs</span>
                 </div>
             </div>
+            
             <div class="modal-total">
                 <span>Total harga:</span>
                 <span id="modalTotal">Rp 0</span>
             </div>
+            
             <div class="modal-actions">
                 <button class="modal-btn cancel" onclick="tutupModal()">Batal</button>
                 <button class="modal-btn add" onclick="konfirmasiTambah()">Tambah</button>
@@ -453,14 +667,16 @@
         </div>
     </div>
 
-    <script type="module" src="data.js"></script>
+    <script src="data.js"></script>
     <script>
+        // ==================== VARIABEL ====================
         let cartItems = [];
         let selectedBarang = null;
         let selectedHargaGrosir = 0;
         let selectedSatuanGrosir = '';
         let suggestionTimeout = null;
 
+        // ==================== FUNGSI KERANJANG ====================
         function loadCart() {
             const saved = localStorage.getItem('tokofariz_cart');
             if (saved) {
@@ -497,12 +713,17 @@
             });
         }
 
+        // ==================== FILTER KATEGORI ====================
         function loadFilterKategori() {
             const container = document.getElementById('filterKategori');
+            
             const kategoriSet = new Set();
-            daftarBarang.forEach(barang => {
-                if (barang.kategori) kategoriSet.add(barang.kategori);
-            });
+            if (window.daftarBarang && window.daftarBarang.length > 0) {
+                window.daftarBarang.forEach(barang => {
+                    if (barang.kategori) kategoriSet.add(barang.kategori);
+                });
+            }
+            
             const kategoriList = Array.from(kategoriSet).sort();
             
             kategoriList.forEach(kat => {
@@ -519,6 +740,7 @@
             });
         }
 
+        // ==================== SEARCH SUGGESTION ====================
         function showSuggestions() {
             const input = document.getElementById('searchInput');
             const keyword = input.value.toLowerCase().trim();
@@ -529,7 +751,9 @@
                 return;
             }
             
-            const hasil = daftarBarang
+            if (!window.daftarBarang) return;
+            
+            const hasil = window.daftarBarang
                 .filter(barang => barang.nama.toLowerCase().includes(keyword))
                 .sort((a, b) => {
                     const aStarts = a.nama.toLowerCase().startsWith(keyword);
@@ -580,8 +804,11 @@
             tampilkanProduk();
         }
 
+        // ==================== FUNGSI UTAMA TAMPIL PRODUK ====================
         function cekPerubahanHarga(namaBarang, hargaSekarang) {
-            const semuaVersi = daftarBarang
+            if (!window.daftarBarang) return null;
+            
+            const semuaVersi = window.daftarBarang
                 .filter(b => b.nama === namaBarang)
                 .sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
             
@@ -590,14 +817,11 @@
             const sebelumnya = semuaVersi[1];
             const hargaSebelum = sebelumnya.modal / sebelumnya.jumlahAngka;
             const selisih = hargaSekarang - hargaSebelum;
-            const persen = ((selisih / hargaSebelum) * 100).toFixed(1);
             
             return {
                 naik: selisih > 0,
                 turun: selisih < 0,
                 selisih: Math.abs(selisih),
-                persen: Math.abs(persen),
-                tanggalSebelum: sebelumnya.tanggal,
                 semuaVersi: semuaVersi
             };
         }
@@ -613,7 +837,9 @@
             const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
             const kategoriActive = document.querySelector('.filter-btn.active')?.getAttribute('data-kategori') || 'semua';
             
-            let hasil = daftarBarang;
+            if (!window.daftarBarang) return;
+            
+            let hasil = [...window.daftarBarang];
             
             if (keyword) {
                 hasil = hasil.filter(barang => 
@@ -630,7 +856,12 @@
             const container = document.getElementById('productList');
             
             if (hasil.length === 0) {
-                container.innerHTML = `<div class="no-result"><p>Tidak ada barang ditemukan</p></div>`;
+                container.innerHTML = `
+                    <div class="no-result">
+                        <p style="font-size: 24px; margin-bottom: 10px;">🔍</p>
+                        <p>Tidak ada barang ditemukan</p>
+                    </div>
+                `;
                 return;
             }
             
@@ -642,7 +873,6 @@
                 let satuanEcer = barang.isiSatuan || barang.jumlahSatuan || 'unit';
                 let satuanGrosir = barang.satuanBeli || 'kemasan';
                 
-                // Logic khusus
                 if (barang.nama.toLowerCase().includes('rokok')) {
                     satuanEcer = 'batang';
                     satuanGrosir = barang.satuanBeli === 'Renceng' ? 'slop' : 'bungkus';
@@ -655,23 +885,17 @@
                     satuanEcer = 'liter';
                     satuanGrosir = 'karung';
                 }
-                if (barang.satuanBeli === 'Peti') {
-                    satuanEcer = 'butir';
-                    satuanGrosir = 'peti';
-                }
                 
                 const cartItem = cartItems.find(item => item.barangId === barang.id);
                 const perubahan = cekPerubahanHarga(barang.nama, hargaGrosir);
                 
                 html += `
                     <div class="product-item" id="item-${barang.id}">
-                        <!-- BARIS 1: Nama dan Kategori -->
                         <div class="product-row-1">
                             <span class="product-nama">${barang.nama}</span>
                             <span class="product-kategori">${barang.kategori || '-'}</span>
                         </div>
                         
-                        <!-- BARIS 2: Harga Ecer | Harga Grosir | Indikator + Keranjang (SEJAJAR) -->
                         <div class="product-row-2">
                             <div class="harga-ecer-box">
                                 <div class="harga-label">Eceran</div>
@@ -707,7 +931,6 @@
                             </div>
                         </div>
                         
-                        <!-- BARIS 3: Tanggal dan Agen -->
                         <div class="product-row-3">
                             <span>📅 ${formatTanggal(barang.tanggal)}</span>
                             ${barang.agen ? `<span>🏪 ${barang.agen}</span>` : ''}
@@ -747,8 +970,9 @@
             container.innerHTML = html;
         }
 
+        // ==================== FUNGSI MODAL ====================
         function bukaModal(barangId, hargaGrosir, satuanGrosir) {
-            const barang = daftarBarang.find(b => b.id == barangId);
+            const barang = window.daftarBarang.find(b => b.id === barangId);
             if (!barang) return;
             
             selectedBarang = barang;
@@ -800,9 +1024,7 @@
                     qty: jumlah,
                     satuan: satuanText,
                     hargaSatuan: selectedHargaGrosir,
-                    totalHarga: totalHarga,
-                    tanggal: selectedBarang.tanggal,
-                    agen: selectedBarang.agen
+                    totalHarga: totalHarga
                 });
             }
             
@@ -811,6 +1033,7 @@
             tutupModal();
         }
 
+        // ==================== FUNGSI BANTU ====================
         function formatRupiah(angka) {
             return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
         }
@@ -821,9 +1044,39 @@
             return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
         }
 
+        // ==================== REAL-TIME LISTENER (FIX BUG) ====================
+        function setupRealtimeListener() {
+            // Cek apakah fungsi subscribe tersedia
+            if (window.subscribeToBarang) {
+                window.subscribeToBarang(function(data) {
+                    console.log('🔄 Data barang berubah, refresh tampilan cek harga');
+                    // Refresh filter kategori
+                    document.getElementById('filterKategori').innerHTML = '<button class="filter-btn active" data-kategori="semua">Semua</button>';
+                    loadFilterKategori();
+                    // Tampilkan ulang produk
+                    tampilkanProduk();
+                });
+            } else {
+                // Fallback: polling setiap 3 detik
+                console.log('Menggunakan polling fallback');
+                setInterval(() => {
+                    if (window.daftarBarang) {
+                        tampilkanProduk();
+                    }
+                }, 3000);
+            }
+        }
+
+        // ==================== INIT ====================
         document.addEventListener('DOMContentLoaded', function() {
             loadCart();
-            loadFilterKategori();
+            
+            // Tunggu data.js load
+            setTimeout(() => {
+                loadFilterKategori();
+                tampilkanProduk();
+                setupRealtimeListener();
+            }, 500);
             
             const searchInput = document.getElementById('searchInput');
             const searchBtn = document.getElementById('searchBtn');
@@ -852,7 +1105,6 @@
             });
             
             document.getElementById('modalJumlah').addEventListener('input', hitungTotalModal);
-            tampilkanProduk();
         });
     </script>
 </body>
