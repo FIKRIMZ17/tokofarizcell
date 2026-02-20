@@ -6,16 +6,16 @@
     <title>TOKO FARIZ CELL - Belanja Bapak</title>
     
     <!-- CEK LOGIN -->
-    <script>
-        if (localStorage.getItem('tokofariz_auth') !== 'true') {
-            window.location.href = 'login.html';
-        }
-    </script>
-    
-    <!-- FIREBASE MODULE -->
-    <script type="module" src="data.js"></script>
-    
-    <link rel="stylesheet" href="style.css">
+<script>
+    if (localStorage.getItem('tokofariz_auth') !== 'true') {
+        window.location.href = 'login.html';
+    }
+</script>
+
+<!-- INI YANG BENAR - SUDAH PAKAI TYPE="MODULE" -->
+<script type="module" src="data.js"></script>
+
+<link rel="stylesheet" href="style.css">
     <style>
         .search-hero {
             background: linear-gradient(145deg, #E6F0FA, #D4E4F5);
@@ -1046,4 +1046,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 </body>
 </html>
+
 
