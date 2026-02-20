@@ -148,18 +148,23 @@
     </div>
 
     <script>
+        // Ambil element
         const form = document.getElementById('formTambah');
-        const hargaInput = document.getElementById('harga');
         const namaInput = document.getElementById('nama');
         const kategoriSelect = document.getElementById('kategori');
+        const hargaInput = document.getElementById('harga');
         const hargaSatuanSpan = document.getElementById('hargaSatuan');
 
+        // Hitung harga satuan
         hargaInput.addEventListener('input', () => {
             if (hargaInput.value) {
                 hargaSatuanSpan.textContent = 'Rp ' + parseInt(hargaInput.value).toLocaleString('id-ID');
+            } else {
+                hargaSatuanSpan.textContent = 'Rp 0';
             }
         });
 
+        // Simpan barang
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
