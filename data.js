@@ -25,31 +25,34 @@ console.log("🔥 Firebase berhasil terkoneksi!");
 
 let daftarBarang = [];
 let daftarKategori = ["Sembako", "Makanan", "Frozen Food", "Rokok", "RT", "Lainnya"];
-let unsubscribe = null;
+let listeners = [];
 
-// LISTENER REAL-TIME
-function subscribeToRealtimeUpdates(callback) {
-    if (unsubscribe) unsubscribe();
-    
+// ========== LISTENER REAL-TIME ==========
+function subscribeToBarang(callback) {
     const barangRef = collection(db, "barang");
     
-    unsubscribe = onSnapshot(barangRef, (snapshot) => {
+    const unsubscribe = onSnapshot(barangRef, (snapshot) => {
         daftarBarang = [];
         snapshot.forEach((doc) => {
             daftarBarang.push({ id: doc.id, ...doc.data() });
         });
         
-        console.log(`📦 Data real-time: ${daftarBarang.length} barang`);
+        console.log(`📦 Data update: ${daftarBarang.length} barang`);
         window.daftarBarang = daftarBarang;
         
-        if (callback) callback(daftarBarang);
-        
-    }, (error) => {
-        console.error("❌ Listener error:", error);
+        // Panggil semua callback yang terdaftar
+        listeners.forEach(cb => cb(daftarBarang));
     });
+    
+    return unsubscribe;
 }
 
-// LOAD DATA
+// ========== DAFTARKAN CALLBACK ==========
+function addListener(callback) {
+    listeners.push(callback);
+}
+
+// ========== LOAD DATA (ONE TIME) ==========
 async function loadData() {
     try {
         const querySnapshot = await getDocs(collection(db, "barang"));
@@ -57,6 +60,7 @@ async function loadData() {
         querySnapshot.forEach((doc) => {
             daftarBarang.push({ id: doc.id, ...doc.data() });
         });
+        
         window.daftarBarang = daftarBarang;
         console.log(`✅ Data loaded: ${daftarBarang.length} barang`);
         return daftarBarang;
@@ -66,12 +70,15 @@ async function loadData() {
     }
 }
 
-// TAMBAH BARANG
+// ========== TAMBAH BARANG ==========
 async function tambahBarang(barang) {
     try {
         const { id, ...dataWithoutId } = barang;
         const docRef = await addDoc(collection(db, "barang"), dataWithoutId);
         console.log(`✅ Barang ditambahkan dengan ID: ${docRef.id}`);
+        
+        // Data otomatis masuk lewat onSnapshot, gak perlu load ulang
+        
         return true;
     } catch (error) {
         console.error("❌ Error adding:", error);
@@ -79,7 +86,7 @@ async function tambahBarang(barang) {
     }
 }
 
-// UPDATE BARANG
+// ========== UPDATE BARANG ==========
 async function updateBarang(id, data) {
     try {
         await updateDoc(doc(db, "barang", id), data);
@@ -91,7 +98,7 @@ async function updateBarang(id, data) {
     }
 }
 
-// HAPUS BARANG
+// ========== HAPUS BARANG ==========
 async function hapusBarang(id) {
     try {
         await deleteDoc(doc(db, "barang", id));
@@ -103,7 +110,7 @@ async function hapusBarang(id) {
     }
 }
 
-// BACKUP JSON
+// ========== BACKUP JSON ==========
 function exportData() {
     try {
         const dataExport = {
@@ -129,14 +136,15 @@ function exportData() {
     }
 }
 
-// LOAD AWAL
+// ========== LOAD AWAL ==========
 loadData();
 
-// EXPORT KE WINDOW
+// ========== EXPORT KE WINDOW ==========
 window.daftarBarang = daftarBarang;
 window.daftarKategori = daftarKategori;
 window.tambahBarang = tambahBarang;
 window.updateBarang = updateBarang;
 window.hapusBarang = hapusBarang;
 window.exportData = exportData;
-window.subscribeToRealtimeUpdates = subscribeToRealtimeUpdates;
+window.subscribeToBarang = subscribeToBarang;
+window.addListener = addListener;
