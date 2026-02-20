@@ -12,222 +12,113 @@
         }
     </script>
     
+    <!-- FIREBASE MODULE -->
+    <script type="module" src="data.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* TAMPILAN GROUP */
-        .product-group {
-            background: white;
-            border: 2px solid #0F4C5C;
-            border-radius: 25px;
-            margin-bottom: 20px;
-            overflow: hidden;
+        .kategori-group {
+            margin-bottom: 25px;
         }
         
-        .group-header {
+        .kategori-title {
             background: #0F4C5C;
             color: white;
-            padding: 15px 20px;
+            padding: 12px 18px;
+            border-radius: 40px 40px 20px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer;
         }
         
-        .group-header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .group-nama {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        
-        .group-count {
+        .kategori-count {
             background: #F18F01;
-            color: white;
-            padding: 3px 10px;
+            padding: 3px 12px;
             border-radius: 30px;
             font-size: 14px;
         }
         
-        .group-header-right {
-            font-size: 24px;
-            transition: transform 0.3s;
-        }
-        
-        .group-header.open .group-header-right {
-            transform: rotate(180deg);
-        }
-        
-        .group-content {
-            display: none;
-            padding: 15px;
-            background: #F8F9FA;
-        }
-        
-        .group-content.show {
-            display: block;
-        }
-        
-        /* VERSI BARANG (RIWAYAT) */
-        .history-item {
+        .barang-item {
             background: white;
             border: 2px solid #E2E8F0;
             border-radius: 18px;
-            padding: 15px;
-            margin-bottom: 10px;
+            padding: 12px 15px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            position: relative;
+            transition: all 0.2s;
         }
         
-        .history-item:last-child {
-            margin-bottom: 0;
+        .barang-info {
+            flex: 1;
         }
         
-        .history-info {
-            flex: 2;
-            min-width: 250px;
-        }
-        
-        .history-tanggal {
-            font-size: 14px;
-            color: #0F4C5C;
+        .barang-nama {
             font-weight: bold;
-            margin-bottom: 5px;
+            color: #0F4C5C;
+            font-size: 16px;
+            margin-bottom: 4px;
         }
         
-        .history-detail {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            font-size: 14px;
+        .barang-detail {
+            font-size: 13px;
             color: #666;
-            margin-bottom: 5px;
-        }
-        
-        .history-harga {
             display: flex;
             gap: 15px;
-            align-items: center;
             flex-wrap: wrap;
         }
         
-        .harga-ecer-history {
-            color: #1E7A5E;
-            font-weight: bold;
-        }
-        
-        .harga-grosir-history {
-            color: #F18F01;
-            font-weight: bold;
-        }
-        
-        .history-agen {
-            background: #E2E8F0;
-            padding: 3px 10px;
-            border-radius: 30px;
-            font-size: 12px;
-            display: inline-block;
-        }
-        
-        /* PERBANDINGAN HARGA */
-        .comparison-badge {
+        .barang-harga {
             background: #FEF5E7;
-            border: 2px solid #F18F01;
-            border-radius: 15px;
-            padding: 10px 15px;
-            min-width: 200px;
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-weight: bold;
+            color: #F18F01;
             text-align: center;
+            min-width: 120px;
+            margin-right: 10px;
         }
         
-        .comparison-title {
-            font-size: 12px;
+        .barang-harga small {
+            display: block;
+            font-size: 11px;
             color: #666;
-            margin-bottom: 5px;
+            font-weight: normal;
         }
         
-        .comparison-agen {
-            font-weight: bold;
-            color: #0F4C5C;
-            margin-bottom: 3px;
-        }
-        
-        .comparison-price {
-            font-size: 18px;
-            font-weight: bold;
-            color: #1E7A5E;
-        }
-        
-        .comparison-savings {
-            font-size: 12px;
-            color: #E53E3E;
-            font-weight: bold;
-        }
-        
-        .no-comparison {
-            background: #EDF2F7;
-            border: 2px dashed #CBD5E0;
-            border-radius: 15px;
-            padding: 10px 15px;
-            min-width: 200px;
-            text-align: center;
-            color: #666;
-            font-size: 13px;
-        }
-        
-        /* TOMBOL EDIT */
-        .edit-button-container {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+        .barang-aksi {
             display: flex;
-            gap: 5px;
+            gap: 8px;
         }
         
-        .btn-edit-item {
+        .btn-aksi {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+        
+        .btn-aksi:active {
+            transform: scale(0.9);
+        }
+        
+        .btn-edit {
             background: #F18F01;
             color: white;
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: transform 0.1s;
         }
         
-        .btn-edit-item:active {
-            transform: scale(0.9);
-        }
-        
-        .btn-delete-item {
+        .btn-hapus {
             background: #E53E3E;
             color: white;
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: transform 0.1s;
-        }
-        
-        .btn-delete-item:active {
-            transform: scale(0.9);
         }
         
         .search-box {
@@ -321,7 +212,6 @@
             display: none;
         }
         
-        /* MODAL EDIT */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -438,6 +328,35 @@
             background: #1E7A5E;
             color: white;
         }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            background: #E2E8F0;
+            border: 2px solid #0F4C5C;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 24px;
+            color: #0F4C5C;
+            font-weight: bold;
+        }
+        
+        .page-title {
+            color: #0F4C5C;
+            font-size: 22px;
+            font-weight: 600;
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -476,11 +395,11 @@
             <input type="file" id="importExcel" accept=".csv" style="display: none;" onchange="handleImportExcel(this)">
         </div>
 
-        <!-- DAFTAR BARANG (GROUP) -->
+        <!-- DAFTAR BARANG -->
         <div id="daftarContainer"></div>
 
         <div class="footer">
-            <p>Daftar barang dengan perbandingan harga antar agen</p>
+            <p>Semua barang yang pernah diinput</p>
         </div>
     </div>
 
@@ -525,7 +444,7 @@
         </div>
     </div>
 
-    <script type="module" src="data.js"></script>
+    <script src="data.js"></script>
     <script>
         // ==================== VARIABEL ====================
         let currentEditId = null;
@@ -552,8 +471,8 @@
             const select = document.getElementById('filterKategori');
             const kategoriSet = new Set();
             
-            if (daftarBarang && daftarBarang.length > 0) {
-                daftarBarang.forEach(barang => {
+            if (window.daftarBarang && window.daftarBarang.length > 0) {
+                window.daftarBarang.forEach(barang => {
                     if (barang.kategori) kategoriSet.add(barang.kategori);
                 });
             }
@@ -569,40 +488,13 @@
             });
         }
 
-        // FUNGSI UNTUK MENDAPATKAN AGEN TERMURAH
-        function getTermurah(versions) {
-            if (!versions || versions.length < 2) return null;
-            
-            // Urutkan berdasarkan harga grosir termurah
-            const sorted = [...versions].sort((a, b) => {
-                const hargaA = a.modal / a.jumlahAngka;
-                const hargaB = b.modal / b.jumlahAngka;
-                return hargaA - hargaB;
-            });
-            
-            const termurah = sorted[0];
-            const termahal = sorted[sorted.length - 1];
-            
-            const hargaTermurah = termurah.modal / termurah.jumlahAngka;
-            const hargaTermahal = termahal.modal / termahal.jumlahAngka;
-            const selisih = hargaTermahal - hargaTermurah;
-            const persen = ((selisih / hargaTermurah) * 100).toFixed(1);
-            
-            return {
-                agen: termurah.agen || 'Agen',
-                harga: hargaTermurah,
-                selisih: selisih,
-                persen: persen
-            };
-        }
-
-        // TAMPILKAN DAFTAR BARANG (GROUP BY NAMA)
+        // TAMPILKAN DAFTAR BARANG
         function tampilkanDaftarBarang() {
             const keyword = document.getElementById('searchBarang').value.toLowerCase().trim();
             const filterKategori = document.getElementById('filterKategori').value;
             const container = document.getElementById('daftarContainer');
             
-            if (!daftarBarang || daftarBarang.length === 0) {
+            if (!window.daftarBarang || window.daftarBarang.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <p style="font-size: 48px;">📭</p>
@@ -614,8 +506,7 @@
                 return;
             }
             
-            // Filter barang
-            let barangFilter = [...daftarBarang];
+            let barangFilter = [...window.daftarBarang];
             
             if (keyword) {
                 barangFilter = barangFilter.filter(b => 
@@ -634,156 +525,70 @@
                 return;
             }
             
-            // GROUP BY NAMA BARANG
-            const groupMap = new Map();
+            // Kelompokkan per kategori
+            const kategoriMap = new Map();
             barangFilter.forEach(barang => {
-                if (!groupMap.has(barang.nama)) {
-                    groupMap.set(barang.nama, []);
+                const kat = barang.kategori || 'Tanpa Kategori';
+                if (!kategoriMap.has(kat)) {
+                    kategoriMap.set(kat, []);
                 }
-                groupMap.get(barang.nama).push(barang);
+                kategoriMap.get(kat).push(barang);
             });
             
-            // Urutkan grup berdasarkan nama
-            const groupEntries = Array.from(groupMap.entries()).sort((a, b) => 
-                a[0].localeCompare(b[0])
-            );
+            const kategoriSorted = Array.from(kategoriMap.keys()).sort();
             
             let html = '';
-            groupEntries.forEach(([nama, versions]) => {
-                // Urutkan versi dari yang terbaru
-                versions.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
-                
-                // Kategori (ambil dari versi terbaru)
-                const kategori = versions[0].kategori || '-';
-                const totalVersions = versions.length;
-                
-                // Cari agen termurah
-                const termurah = getTermurah(versions);
+            kategoriSorted.forEach(kat => {
+                const barangList = kategoriMap.get(kat);
                 
                 html += `
-                    <div class="product-group">
-                        <div class="group-header" onclick="toggleGroup(this)">
-                            <div class="group-header-left">
-                                <span class="group-nama">${nama}</span>
-                                <span class="group-count">${totalVersions} riwayat</span>
-                                <span style="background: #F18F01; color: white; padding: 3px 10px; border-radius: 30px; font-size: 12px;">${kategori}</span>
-                            </div>
-                            <div class="group-header-right">▼</div>
+                    <div class="kategori-group">
+                        <div class="kategori-title">
+                            <span>${kat}</span>
+                            <span class="kategori-count">${barangList.length}</span>
                         </div>
-                        <div class="group-content">
                 `;
                 
-                // Tampilkan semua versi
-                versions.forEach((barang, index) => {
-                    const hargaEcer = barang.modal / barang.totalUnit;
-                    const hargaGrosir = barang.modal / barang.jumlahAngka;
-                    
-                    let satuanEcer = barang.isiSatuan || barang.jumlahSatuan || 'unit';
-                    let satuanGrosir = barang.satuanBeli || 'kemasan';
-                    
-                    // Logic khusus (sama seperti di cek harga)
-                    if (barang.nama && barang.nama.toLowerCase().includes('rokok')) {
-                        satuanEcer = 'batang';
-                        satuanGrosir = barang.satuanBeli === 'Renceng' ? 'slop' : 'bungkus';
-                    }
+                barangList.forEach(barang => {
+                    const hargaSatuan = barang.modal / barang.totalUnit;
+                    const satuan = barang.isiSatuan || barang.jumlahSatuan || 'unit';
                     
                     html += `
-                        <div class="history-item" id="item-${barang.id}">
-                            <div class="edit-button-container">
-                                <button class="btn-edit-item" onclick="bukaModalEdit('${barang.id}')" title="Edit barang">✏️</button>
-                                <button class="btn-delete-item" onclick="hapusBarang('${barang.id}')" title="Hapus barang">🗑️</button>
+                        <div class="barang-item" id="item-${barang.id}">
+                            <div class="barang-info">
+                                <div class="barang-nama">${barang.nama || 'Tanpa Nama'}</div>
+                                <div class="barang-detail">
+                                    <span>📦 ${barang.catatan || '-'}</span>
+                                    <span>📅 ${formatTanggal(barang.tanggal)}</span>
+                                    <span>🏪 ${barang.agen || '-'}</span>
+                                </div>
                             </div>
                             
-                            <div class="history-info">
-                                <div class="history-tanggal">📅 ${formatTanggal(barang.tanggal)}</div>
-                                <div class="history-detail">
-                                    <span class="history-harga">
-                                        <span class="harga-ecer-history">${formatRupiah(hargaEcer)}/${satuanEcer}</span>
-                                        <span class="harga-grosir-history">${formatRupiah(hargaGrosir)}/${satuanGrosir}</span>
-                                    </span>
-                                    <span class="history-agen">🏪 ${barang.agen || 'Agen'}</span>
+                            <div style="display: flex; align-items: center;">
+                                <div class="barang-harga">
+                                    ${formatRupiah(hargaSatuan)} <small>/${satuan}</small>
+                                </div>
+                                
+                                <div class="barang-aksi">
+                                    <button class="btn-aksi btn-edit" onclick="bukaModalEdit('${barang.id}')">✏️</button>
+                                    <button class="btn-aksi btn-hapus" onclick="hapusBarang('${barang.id}')">🗑️</button>
                                 </div>
                             </div>
+                        </div>
                     `;
-                    
-                    // TAMPILKAN PERBANDINGAN HARGA
-                    if (index === 0) {
-                        if (termurah) {
-                            const hemat = ((versions[0].modal / versions[0].jumlahAngka) - termurah.harga).toFixed(0);
-                            html += `
-                                <div class="comparison-badge">
-                                    <div class="comparison-title">💡 Termurah di</div>
-                                    <div class="comparison-agen">${termurah.agen}</div>
-                                    <div class="comparison-price">${formatRupiah(termurah.harga)}</div>
-                                    ${hemat > 0 ? 
-                                        `<div class="comparison-savings">Hemat ${formatRupiah(hemat)} (${termurah.persen}%)</div>` : 
-                                        `<div class="comparison-savings" style="color: #1E7A5E;">Harga terendah</div>`
-                                    }
-                                </div>
-                            `;
-                        } else {
-                            html += `
-                                <div class="no-comparison">
-                                    Hanya 1 agen
-                                </div>
-                            `;
-                        }
-                    } else {
-                        // Untuk versi lainnya, tampilkan perbandingan dengan yang sekarang
-                        const hargaSekarang = versions[0].modal / versions[0].jumlahAngka;
-                        const hargaIni = barang.modal / barang.jumlahAngka;
-                        const selisih = hargaSekarang - hargaIni;
-                        
-                        if (selisih > 0) {
-                            html += `
-                                <div class="no-comparison" style="border-color: #1E7A5E;">
-                                    <span style="color: #1E7A5E;">⬆️ ${formatRupiah(selisih)} lebih murah</span>
-                                </div>
-                            `;
-                        } else if (selisih < 0) {
-                            html += `
-                                <div class="no-comparison" style="border-color: #E53E3E;">
-                                    <span style="color: #E53E3E;">⬇️ ${formatRupiah(Math.abs(selisih))} lebih mahal</span>
-                                </div>
-                            `;
-                        } else {
-                            html += `
-                                <div class="no-comparison">
-                                    Harga sama
-                                </div>
-                            `;
-                        }
-                    }
-                    
-                    html += `</div>`;
                 });
                 
-                html += `</div></div>`;
+                html += `</div>`;
             });
             
             container.innerHTML = html;
-            
-            // Buka grup pertama secara otomatis
-            const firstGroup = document.querySelector('.group-content');
-            if (firstGroup) {
-                firstGroup.classList.add('show');
-                const firstHeader = document.querySelector('.group-header');
-                if (firstHeader) firstHeader.classList.add('open');
-            }
-        }
-
-        // TOGGLE GROUP (buka/tutup)
-        function toggleGroup(header) {
-            header.classList.toggle('open');
-            const content = header.nextElementSibling;
-            content.classList.toggle('show');
         }
 
         // ==================== FUNGSI EDIT ====================
 
         // BUKA MODAL EDIT
         function bukaModalEdit(id) {
-            const barang = daftarBarang.find(b => b.id === id);
+            const barang = window.daftarBarang.find(b => b.id === id);
             if (!barang) {
                 showError('Barang tidak ditemukan');
                 return;
@@ -796,12 +601,11 @@
             document.getElementById('editHarga').value = barang.modal || 0;
             document.getElementById('editCatatan').value = barang.catatan || '';
             
-            // Load kategori
             const selectKategori = document.getElementById('editKategori');
             selectKategori.innerHTML = '<option value="">-- Pilih Kategori --</option>';
             
-            if (daftarKategori && daftarKategori.length > 0) {
-                daftarKategori.forEach(kat => {
+            if (window.daftarKategori && window.daftarKategori.length > 0) {
+                window.daftarKategori.forEach(kat => {
                     const option = document.createElement('option');
                     option.value = kat;
                     option.textContent = kat;
@@ -822,7 +626,7 @@
         }
 
         // SIMPAN EDIT
-        function simpanEdit() {
+        async function simpanEdit() {
             const id = document.getElementById('editId').value;
             const nama = document.getElementById('editNama').value.trim();
             const kategori = document.getElementById('editKategori').value;
@@ -834,65 +638,46 @@
                 return;
             }
             
-            // Cari index barang
-            const index = daftarBarang.findIndex(b => b.id === id);
-            if (index === -1) {
-                showError('Barang tidak ditemukan');
+            const data = {
+                nama: nama,
+                kategori: kategori,
+                modal: harga,
+                catatan: catatan
+            };
+            
+            const berhasil = await window.updateBarang(id, data);
+            
+            if (berhasil) {
+                // Data otomatis update via listener, gak perlu refresh manual
                 tutupModalEdit();
-                return;
+                showSuccess('✅ Barang berhasil diupdate');
+            } else {
+                showError('❌ Gagal mengupdate barang');
             }
-            
-            // Update data
-            daftarBarang[index].nama = nama;
-            daftarBarang[index].kategori = kategori;
-            daftarBarang[index].modal = harga;
-            daftarBarang[index].catatan = catatan;
-            
-            // Simpan ke localStorage
-            simpanData();
-            
-            // Refresh tampilan
-            loadFilterKategori();
-            tampilkanDaftarBarang();
-            tutupModalEdit();
-            
-            showSuccess('✅ Barang berhasil diupdate');
         }
 
         // ==================== FUNGSI HAPUS ====================
 
-        // HAPUS BARANG
-        function hapusBarang(id) {
+        async function hapusBarang(id) {
             if (!confirm('Yakin hapus barang ini?')) return;
             
-            const index = daftarBarang.findIndex(b => b.id === id);
-            if (index === -1) {
-                showError('Barang tidak ditemukan');
-                return;
+            const berhasil = await window.hapusBarang(id);
+            if (berhasil) {
+                showSuccess('✅ Barang berhasil dihapus');
+                // Data otomatis update via listener
+            } else {
+                showError('❌ Gagal menghapus barang');
             }
-            
-            // Hapus dari array
-            daftarBarang.splice(index, 1);
-            
-            // Simpan ke localStorage
-            simpanData();
-            
-            // Refresh tampilan
-            loadFilterKategori();
-            tampilkanDaftarBarang();
-            
-            showSuccess('✅ Barang berhasil dihapus');
         }
 
         // ==================== FUNGSI EXPORT/IMPORT ====================
 
         function handleImportJson(input) {
             if (input.files && input.files[0]) {
-                importData(input.files[0]).then((result) => {
-                    loadFilterKategori();
-                    tampilkanDaftarBarang();
+                window.importData(input.files[0]).then((result) => {
                     input.value = '';
                     showSuccess('✅ Import JSON berhasil');
+                    // Data otomatis update via listener
                 }).catch(err => {
                     showError('Gagal import: ' + err);
                     input.value = '';
@@ -902,9 +687,7 @@
 
         function handleImportExcel(input) {
             if (input.files && input.files[0]) {
-                importFromExcel(input.files[0]).then((result) => {
-                    loadFilterKategori();
-                    tampilkanDaftarBarang();
+                window.importFromExcel(input.files[0]).then((result) => {
                     input.value = '';
                     showSuccess('✅ Import Excel berhasil');
                 }).catch(err => {
@@ -925,19 +708,39 @@
             if (!tanggal) return '-';
             try {
                 const date = new Date(tanggal);
-                return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
             } catch (e) {
                 return '-';
             }
         }
 
+        // ==================== REAL-TIME LISTENER (FIX BUG) ====================
+        function setupRealtimeListener() {
+            if (window.subscribeToBarang) {
+                window.subscribeToBarang(function(data) {
+                    console.log('🔄 Data barang berubah, refresh daftar barang');
+                    loadFilterKategori();
+                    tampilkanDaftarBarang();
+                });
+            } else {
+                // Fallback polling
+                setInterval(() => {
+                    if (window.daftarBarang) {
+                        loadFilterKategori();
+                        tampilkanDaftarBarang();
+                    }
+                }, 3000);
+            }
+        }
+
         // ==================== INIT ====================
         document.addEventListener('DOMContentLoaded', function() {
-            // Pastikan data sudah diload
+            // Tunggu data.js load
             setTimeout(() => {
                 loadFilterKategori();
                 tampilkanDaftarBarang();
-            }, 100);
+                setupRealtimeListener();
+            }, 500);
             
             document.getElementById('searchBarang').addEventListener('keyup', function() {
                 tampilkanDaftarBarang();
