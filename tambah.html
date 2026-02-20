@@ -2,43 +2,217 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>➕ Tambah Barang - TOKO FARIZ CELL</title>
     
+    <!-- CEK LOGIN -->
     <script>
         if (localStorage.getItem('tokofariz_auth') !== 'true') {
             window.location.href = 'login.html';
         }
     </script>
     
+    <!-- FIREBASE - PAKAI TYPE MODULE -->
     <script type="module" src="data.js"></script>
-    
+    <link rel="stylesheet" href="style.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
+        .step-indicator {
+            display: flex;
+            margin-bottom: 20px;
+            background: #F0F4F8;
+            border-radius: 50px;
+            padding: 5px;
         }
-        body {
-            background: #f0f2f5;
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 50px;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .step.active {
+            background: #0F4C5C;
+            color: white;
+        }
+        
+        .date-selector {
+            background: #E6F0FA;
+            border-radius: 25px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 3px solid #0F4C5C;
+            text-align: center;
+        }
+        
+        .date-selector h3 {
+            color: #0F4C5C;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .date-input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .date-input-group label {
+            display: block;
+            font-weight: bold;
+            color: #0F4C5C;
+            margin-bottom: 8px;
+            font-size: 16px;
+            text-align: left;
+        }
+        
+        .date-input-group input {
+            width: 100%;
             padding: 15px;
+            font-size: 16px;
+            border: 3px solid #CBD5E0;
+            border-radius: 15px;
+            outline: none;
+            box-sizing: border-box;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
+        
+        .btn-lanjut {
+            background: #1E7A5E;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            border: 2px solid #0F4C5C;
+            margin-top: 10px;
         }
+        
+        .form-container {
+            display: none;
+        }
+        
+        .form-container.show {
+            display: block;
+        }
+        
+        .info-tanggal {
+            background: #FEF5E7;
+            border-radius: 15px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid #F18F01;
+            flex-wrap: wrap;
+        }
+        
+        .info-tanggal span {
+            font-weight: bold;
+            color: #0F4C5C;
+        }
+        
+        .btn-ganti-tanggal {
+            background: #E2E8F0;
+            border: none;
+            border-radius: 30px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: auto;
+            font-weight: bold;
+        }
+        
+        .satuan-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .satuan-row select {
+            width: 120px;
+            padding: 12px;
+            border: 3px solid #CBD5E0;
+            border-radius: 15px;
+        }
+        
+        .info-harga {
+            background: #E6F0FA;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid #0F4C5C;
+        }
+        
+        .info-harga p {
+            margin: 5px 0;
+            font-size: 18px;
+        }
+        
+        .harga-besar {
+            font-size: 32px;
+            font-weight: bold;
+            color: #F18F01;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #0F4C5C;
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 3px solid #CBD5E0;
+            border-radius: 15px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .btn-simpan {
+            background: #1E7A5E;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            border: 2px solid #0F4C5C;
+            margin: 20px 0;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 18px;
+            border-top: 2px solid #CBD5E0;
+            color: #4A5568;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
         .page-header {
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 20px;
         }
+        
         .back-btn {
-            background: #e2e8f0;
+            background: #E2E8F0;
             border: 2px solid #0F4C5C;
             border-radius: 50%;
             width: 45px;
@@ -49,144 +223,322 @@
             text-decoration: none;
             font-size: 24px;
             color: #0F4C5C;
+            font-weight: bold;
         }
+        
         .page-title {
             color: #0F4C5C;
             font-size: 22px;
-            font-weight: bold;
+            font-weight: 600;
             flex: 1;
         }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            color: #0F4C5C;
-            margin-bottom: 8px;
-        }
-        .form-control {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #cbd5e0;
-            border-radius: 10px;
-            font-size: 16px;
-        }
-        .btn-simpan {
-            background: #1E7A5E;
-            color: white;
-            border: none;
-            border-radius: 10px;
+        
+        .success-message {
+            background: #C6F6D5;
+            color: #22543D;
             padding: 15px;
-            font-size: 18px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: center;
             font-weight: bold;
-            width: 100%;
-            cursor: pointer;
-            margin: 20px 0;
+            display: none;
         }
-        .info-harga {
-            background: #e6f0fa;
+        
+        .error-message {
+            background: #FEEBC8;
+            color: #7B341E;
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 15px;
+            margin: 15px 0;
             text-align: center;
-            margin: 20px 0;
-        }
-        .harga-besar {
-            font-size: 32px;
             font-weight: bold;
-            color: #F18F01;
-        }
-        .footer {
-            text-align: center;
-            color: #666;
-            margin-top: 20px;
-            font-size: 14px;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="page-header">
-            <a href="index.html" class="back-btn">←</a>
+            <a href="index.html" class="back-btn">◀</a>
             <h1 class="page-title">➕ TAMBAH BARANG</h1>
+            <div style="width: 45px;"></div>
         </div>
 
-        <form id="formTambah">
-            <div class="form-group">
-                <label>📝 Nama Barang</label>
-                <input type="text" id="nama" class="form-control" required>
+        <!-- PESAN -->
+        <div id="successMessage" class="success-message"></div>
+        <div id="errorMessage" class="error-message"></div>
+
+        <!-- STEP INDICATOR -->
+        <div class="step-indicator">
+            <div class="step active" id="step1">1. Pilih Tanggal & Agen</div>
+            <div class="step" id="step2">2. Input Barang</div>
+        </div>
+
+        <!-- STEP 1: PILIH TANGGAL & AGEN -->
+        <div id="step1Container">
+            <div class="date-selector">
+                <h3>📅 Pilih Tanggal Belanja</h3>
+                
+                <div class="date-input-group">
+                    <label>Tanggal</label>
+                    <input type="date" id="tanggalInput" required>
+                </div>
+                
+                <div class="date-input-group">
+                    <label>🏪 Nama Agen</label>
+                    <input type="text" id="agenInput" placeholder="Contoh: Agen Jaya">
+                </div>
+                
+                <button class="btn-lanjut" onclick="lanjutKeStep2()">LANJUTKAN ➔</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: INPUT BARANG -->
+        <div id="step2Container" class="form-container">
+            <!-- INFO TANGGAL & AGEN -->
+            <div class="info-tanggal">
+                <span>📅</span>
+                <span id="tanggalTerpilih">-</span>
+                <span>🏪</span>
+                <span id="agenTerpilih">-</span>
+                <button class="btn-ganti-tanggal" onclick="kembaliKeStep1()">Ganti</button>
             </div>
 
-            <div class="form-group">
-                <label>📁 Kategori</label>
-                <select id="kategori" class="form-control" required>
-                    <option value="Sembako">Sembako</option>
-                    <option value="Makanan">Makanan</option>
-                    <option value="Frozen Food">Frozen Food</option>
-                    <option value="Rokok">Rokok</option>
-                    <option value="RT">Perlampuan RT</option>
-                    <option value="Lainnya">Lainnya</option>
-                </select>
-            </div>
+            <form id="formTambahBarang">
+                <!-- NAMA BARANG -->
+                <div class="form-group">
+                    <label>📝 Nama Barang</label>
+                    <input type="text" id="namaBarang" class="form-control" required>
+                </div>
 
-            <div class="form-group">
-                <label>💰 Harga Modal</label>
-                <input type="number" id="harga" class="form-control" required>
-            </div>
+                <!-- KATEGORI -->
+                <div class="form-group">
+                    <label>📁 Kategori</label>
+                    <select id="kategoriBarang" class="form-control" required>
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="Sembako">Sembako</option>
+                        <option value="Makanan">Makanan</option>
+                        <option value="Frozen Food">Frozen Food</option>
+                        <option value="Rokok">Rokok</option>
+                        <option value="RT">Perlampuan RT</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
 
-            <div class="info-harga" id="infoHarga">
-                <p>🔍 HARGA SATUAN</p>
-                <p class="harga-besar" id="hargaSatuan">Rp 0</p>
-            </div>
+                <!-- SATUAN BELI -->
+                <div class="form-group">
+                    <label>📦 Bentuk beli</label>
+                    <select id="satuanBeliSelect" class="form-control" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="Karung">Karung</option>
+                        <option value="Dus">Dus</option>
+                        <option value="Renceng">Renceng</option>
+                        <option value="Pack">Pack</option>
+                        <option value="Kg">Kg</option>
+                        <option value="Liter">Liter</option>
+                        <option value="Pcs">Pcs</option>
+                    </select>
+                </div>
 
-            <button type="submit" class="btn-simpan">💾 SIMPAN</button>
-        </form>
+                <!-- JUMLAH -->
+                <div class="form-group">
+                    <label>🔢 Jumlah</label>
+                    <div class="satuan-row">
+                        <input type="number" id="jumlahAngka" class="form-control" min="1" value="1" required style="flex:2;">
+                        <select id="jumlahSatuan" class="form-control" style="flex:1;">
+                            <option>Karung</option>
+                            <option>Dus</option>
+                            <option>Renceng</option>
+                            <option>Pack</option>
+                            <option>Kg</option>
+                            <option>Liter</option>
+                            <option>Pcs</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ISI KEMASAN -->
+                <div class="form-group">
+                    <label>📦 Isi per kemasan</label>
+                    <div class="satuan-row">
+                        <input type="number" id="isiKemasanAngka" class="form-control" min="1" value="1" style="flex:2;">
+                        <select id="isiKemasanSatuan" class="form-control" style="flex:1;">
+                            <option>Bungkus</option>
+                            <option>Pcs</option>
+                            <option>Butir</option>
+                            <option>Liter</option>
+                            <option>Kg</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- HARGA MODAL -->
+                <div class="form-group">
+                    <label>💰 Harga Modal Total</label>
+                    <input type="number" id="hargaModal" class="form-control" min="0" required>
+                </div>
+
+                <!-- INFO HARGA SATUAN -->
+                <div class="info-harga">
+                    <p>🔍 HARGA SATUAN MODAL:</p>
+                    <p class="harga-besar" id="hargaSatuan">Rp 0</p>
+                </div>
+
+                <!-- TOMBOL SIMPAN -->
+                <button type="submit" class="btn-simpan">💾 SIMPAN BARANG</button>
+            </form>
+        </div>
 
         <div class="footer">
-            <p>Input barang baru</p>
+            <p>Input barang setelah belanja, Pak 📝</p>
         </div>
     </div>
 
     <script>
-        // Ambil element
-        const form = document.getElementById('formTambah');
-        const namaInput = document.getElementById('nama');
-        const kategoriSelect = document.getElementById('kategori');
-        const hargaInput = document.getElementById('harga');
-        const hargaSatuanSpan = document.getElementById('hargaSatuan');
+        // Variabel
+        let selectedTanggal = '';
+        let selectedAgen = '';
+
+        // Set tanggal default hari ini
+        function setDefaultTanggal() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('tanggalInput').value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        // Lanjut ke step 2
+        function lanjutKeStep2() {
+            const tanggal = document.getElementById('tanggalInput').value;
+            const agen = document.getElementById('agenInput').value.trim();
+            
+            if (!tanggal) {
+                alert('Pilih tanggal dulu!');
+                return;
+            }
+            
+            selectedTanggal = tanggal;
+            selectedAgen = agen || '-';
+            
+            document.getElementById('tanggalTerpilih').textContent = selectedTanggal;
+            document.getElementById('agenTerpilih').textContent = selectedAgen;
+            
+            document.getElementById('step1Container').style.display = 'none';
+            document.getElementById('step2Container').classList.add('show');
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+        }
+
+        // Kembali ke step 1
+        function kembaliKeStep1() {
+            document.getElementById('step2Container').classList.remove('show');
+            document.getElementById('step1Container').style.display = 'block';
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step2').classList.remove('active');
+        }
 
         // Hitung harga satuan
-        hargaInput.addEventListener('input', () => {
-            if (hargaInput.value) {
-                hargaSatuanSpan.textContent = 'Rp ' + parseInt(hargaInput.value).toLocaleString('id-ID');
-            } else {
-                hargaSatuanSpan.textContent = 'Rp 0';
+        function hitungHarga() {
+            const modal = parseFloat(document.getElementById('hargaModal').value) || 0;
+            const jumlah = parseFloat(document.getElementById('jumlahAngka').value) || 1;
+            const isi = parseFloat(document.getElementById('isiKemasanAngka').value) || 1;
+            
+            const totalUnit = jumlah * isi;
+            const harga = modal / totalUnit;
+            
+            if (modal > 0 && totalUnit > 0) {
+                document.getElementById('hargaSatuan').textContent = formatRupiah(harga);
             }
-        });
+        }
 
-        // Simpan barang
-        form.addEventListener('submit', async (e) => {
+        // Format rupiah
+        function formatRupiah(angka) {
+            return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+        }
+
+        // Tampilkan pesan sukses
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+        
+        // Tampilkan pesan error
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+
+        // Simpan barang ke Firebase
+        async function simpanBarang(e) {
             e.preventDefault();
             
-            const barang = {
-                nama: namaInput.value,
-                kategori: kategoriSelect.value,
-                modal: parseInt(hargaInput.value),
-                tanggal: new Date().toISOString().split('T')[0]
+            const nama = document.getElementById('namaBarang').value.trim();
+            const kategori = document.getElementById('kategoriBarang').value;
+            const satuanBeli = document.getElementById('satuanBeliSelect').value;
+            const jumlahAngka = parseFloat(document.getElementById('jumlahAngka').value);
+            const isiAngka = parseFloat(document.getElementById('isiKemasanAngka').value) || 1;
+            const isiSatuan = document.getElementById('isiKemasanSatuan').value;
+            const modal = parseFloat(document.getElementById('hargaModal').value);
+            
+            if (!nama || !kategori || !satuanBeli || !modal) {
+                showError('Semua harus diisi!');
+                return;
+            }
+            
+            const totalUnit = jumlahAngka * isiAngka;
+            const catatan = `${jumlahAngka} ${satuanBeli} @ ${isiAngka} ${isiSatuan}`;
+            
+            const barangBaru = {
+                nama: nama,
+                kategori: kategori,
+                agen: selectedAgen,
+                tanggal: selectedTanggal,
+                satuanBeli: satuanBeli,
+                jumlahAngka: jumlahAngka,
+                isiAngka: isiAngka,
+                isiSatuan: isiSatuan,
+                modal: modal,
+                totalUnit: totalUnit,
+                catatan: catatan
             };
-
+            
             try {
-                const result = await window.tambahBarang(barang);
-                if (result) {
-                    alert('✅ Barang berhasil disimpan!');
-                    form.reset();
-                    hargaSatuanSpan.textContent = 'Rp 0';
+                const berhasil = await window.tambahBarang(barangBaru);
+                
+                if (berhasil) {
+                    showSuccess('✅ Barang berhasil disimpan!');
+                    
+                    // Reset form
+                    document.getElementById('namaBarang').value = '';
+                    document.getElementById('hargaModal').value = '';
+                    document.getElementById('jumlahAngka').value = '1';
+                    document.getElementById('isiKemasanAngka').value = '1';
+                    document.getElementById('satuanBeliSelect').value = '';
+                    document.getElementById('kategoriBarang').value = '';
+                    
+                    document.getElementById('hargaSatuan').textContent = 'Rp 0';
                 } else {
-                    alert('❌ Gagal menyimpan');
+                    showError('❌ Gagal menyimpan!');
                 }
             } catch (error) {
-                alert('Error: ' + error.message);
+                console.error(error);
+                showError('Error: ' + error.message);
             }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', function() {
+            setDefaultTanggal();
+            
+            document.getElementById('hargaModal').addEventListener('input', hitungHarga);
+            document.getElementById('jumlahAngka').addEventListener('input', hitungHarga);
+            document.getElementById('isiKemasanAngka').addEventListener('input', hitungHarga);
+            document.getElementById('formTambahBarang').addEventListener('submit', simpanBarang);
         });
     </script>
 </body>
