@@ -12,9 +12,11 @@
         }
     </script>
     
+    <!-- FIREBASE MODULE -->
+    <script type="module" src="data.js"></script>
+    
     <link rel="stylesheet" href="style.css">
     <style>
-        /* TAMPILAN SAMA PERSIS */
         .cart-item {
             background: white;
             border: 2px solid #E2E8F0;
@@ -148,6 +150,7 @@
             width: 100%;
             cursor: pointer;
             margin-top: 10px;
+            font-size: 16px;
         }
         
         .btn-refresh {
@@ -161,6 +164,7 @@
             cursor: pointer;
             margin-bottom: 15px;
             border: 2px solid #0F4C5C;
+            font-size: 16px;
         }
         
         .empty-cart {
@@ -168,6 +172,12 @@
             padding: 50px 20px;
             background: #EDF2F7;
             border-radius: 25px;
+        }
+        
+        .empty-cart p {
+            font-size: 18px;
+            color: #666;
+            margin: 15px 0;
         }
         
         .btn-belanja {
@@ -202,6 +212,45 @@
             text-align: center;
             font-weight: bold;
             display: none;
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            background: #E2E8F0;
+            border: 2px solid #0F4C5C;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 24px;
+            color: #0F4C5C;
+            font-weight: bold;
+        }
+        
+        .page-title {
+            color: #0F4C5C;
+            font-size: 22px;
+            font-weight: 600;
+            flex: 1;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 18px;
+            border-top: 2px solid #CBD5E0;
+            color: #4A5568;
+            font-size: 15px;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -246,12 +295,27 @@
         </div>
     </div>
 
-    <script type="module" src="data.js"></script>
+    <script src="data.js"></script>
     <script>
-        // ==================== VARIABEL GLOBAL ====================
+        // ==================== VARIABEL ====================
         let cartItems = [];
 
-        // ==================== FUNGSI DASAR ====================
+        // ==================== FUNGSI TAMPILAN PESAN ====================
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 2000);
+        }
+        
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 2000);
+        }
+
+        // ==================== FUNGSI KERANJANG ====================
         
         // Load keranjang dari localStorage
         function loadCart() {
@@ -259,18 +323,16 @@
                 const saved = localStorage.getItem('tokofariz_cart');
                 if (saved) {
                     cartItems = JSON.parse(saved);
-                    // Validasi
                     if (!Array.isArray(cartItems)) cartItems = [];
                     
-                    // Filter item yang valid dan beri ID jika perlu
+                    // Filter item yang valid
                     cartItems = cartItems.filter(item => item && typeof item === 'object');
                     
-                    // Generate ID unik untuk setiap item
+                    // Pastikan setiap item punya ID
                     cartItems = cartItems.map((item, index) => {
                         if (!item.id) {
                             item.id = 'cart_' + Date.now() + '_' + index + '_' + Math.random().toString(36).substr(2, 5);
                         }
-                        // Pastikan properti penting ada
                         item.nama = item.nama || 'Tanpa Nama';
                         item.qty = item.qty || 1;
                         item.satuan = item.satuan || 'pcs';
@@ -299,7 +361,7 @@
             }
         }
 
-        // Refresh tampilan
+        // Render keranjang
         function renderCart() {
             const cartList = document.getElementById('cartList');
             const emptyCart = document.getElementById('emptyCart');
@@ -321,14 +383,11 @@
             cartItems.forEach((item, index) => {
                 if (!item) return;
                 
-                // Gunakan index sebagai fallback ID
                 const itemId = item.id || 'idx_' + index;
-                const displayId = 'item_' + index; // ID untuk HTML
-                
                 total += item.totalHarga || 0;
                 
                 html += `
-                    <div class="cart-item" id="cart-${displayId}">
+                    <div class="cart-item" id="cart-${itemId}">
                         <div class="cart-item-left">
                             <h3>${item.nama || 'Tanpa Nama'}</h3>
                             <p>${item.qty || 1} ${item.satuan || 'pcs'} × ${formatRupiah(item.hargaSatuan || 0)}</p>
@@ -338,9 +397,9 @@
                             
                             <!-- TOMBOL EDIT JUMLAH -->
                             <div class="qty-control">
-                                <button class="qty-btn" onclick="updateQty('${itemId}', ${index}, -1)">−</button>
+                                <button class="qty-btn" onclick="updateQty(${index}, -1)">−</button>
                                 <span class="qty-value">${item.qty || 1}</span>
-                                <button class="qty-btn" onclick="updateQty('${itemId}', ${index}, 1)">+</button>
+                                <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
                             </div>
                             
                             <!-- TOMBOL AKSI -->
@@ -357,61 +416,42 @@
             document.getElementById('grandTotal').textContent = formatRupiah(total);
         }
 
-        // ==================== FUNGSI UTAMA ====================
-
-        // Update jumlah berdasarkan INDEX (paling stabil)
-        function updateQty(id, index, delta) {
-            // Cek index valid
-            if (index < 0 || index >= cartItems.length) {
-                showError('Item tidak ditemukan (index)');
-                return;
-            }
-            
-            const item = cartItems[index];
-            
-            // Validasi item
-            if (!item) {
-                showError('Item tidak valid');
-                return;
-            }
-            
-            const newQty = (item.qty || 1) + delta;
-            
-            if (newQty < 1) {
-                // Tanya hapus
-                if (confirm('Hapus item ini?')) {
-                    deleteItem(index);
-                }
-                return;
-            }
-            
-            // Update
-            item.qty = newQty;
-            item.totalHarga = (item.hargaSatuan || 0) * newQty;
-            
-            // Simpan dan refresh
-            saveCart();
-            renderCart();
-            showSuccess('Jumlah diupdate');
-        }
-
-        // Hapus item berdasarkan INDEX
-        function deleteItem(index) {
-            // Cek index valid
+        // Update jumlah berdasarkan INDEX
+        function updateQty(index, delta) {
             if (index < 0 || index >= cartItems.length) {
                 showError('Item tidak ditemukan');
                 return;
             }
             
             const item = cartItems[index];
-            const itemName = item ? item.nama : 'Item';
+            const newQty = (item.qty || 1) + delta;
+            
+            if (newQty < 1) {
+                if (confirm('Hapus item ini?')) {
+                    deleteItem(index);
+                }
+                return;
+            }
+            
+            item.qty = newQty;
+            item.totalHarga = (item.hargaSatuan || 0) * newQty;
+            
+            saveCart();
+            renderCart();
+        }
+
+        // Hapus item berdasarkan INDEX
+        function deleteItem(index) {
+            if (index < 0 || index >= cartItems.length) {
+                showError('Item tidak ditemukan');
+                return;
+            }
+            
+            const itemName = cartItems[index]?.nama || 'Item';
             
             if (!confirm(`Hapus ${itemName} dari keranjang?`)) return;
             
-            // Hapus berdasarkan index
             cartItems.splice(index, 1);
-            
-            // Simpan dan refresh
             saveCart();
             renderCart();
             showSuccess('✅ Item dihapus');
@@ -445,31 +485,41 @@
             }
         }
 
-        // ==================== FUNGSI BANTU ====================
-
-        function showSuccess(msg) {
-            const el = document.getElementById('successMessage');
-            el.textContent = msg;
-            el.style.display = 'block';
-            setTimeout(() => { el.style.display = 'none'; }, 2000);
-        }
-        
-        function showError(msg) {
-            const el = document.getElementById('errorMessage');
-            el.textContent = msg;
-            el.style.display = 'block';
-            setTimeout(() => { el.style.display = 'none'; }, 2000);
-        }
-
+        // Format Rupiah
         function formatRupiah(angka) {
             if (!angka) return 'Rp 0';
             return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+        }
+
+        // ==================== REAL-TIME LISTENER (UNTUK UPDATE HARGA) ====================
+        function setupRealtimeListener() {
+            if (window.subscribeToBarang) {
+                window.subscribeToBarang(function(data) {
+                    console.log('🔄 Data barang berubah, update harga di keranjang');
+                    // Update harga satuan berdasarkan data terbaru dari Firebase
+                    if (cartItems.length > 0 && data.length > 0) {
+                        cartItems.forEach(item => {
+                            const barangTerbaru = data.find(b => b.nama === item.nama);
+                            if (barangTerbaru) {
+                                const hargaGrosirBaru = barangTerbaru.modal / barangTerbaru.jumlahAngka;
+                                if (hargaGrosirBaru !== item.hargaSatuan) {
+                                    item.hargaSatuan = hargaGrosirBaru;
+                                    item.totalHarga = item.qty * hargaGrosirBaru;
+                                }
+                            }
+                        });
+                        saveCart();
+                        renderCart();
+                    }
+                });
+            }
         }
 
         // ==================== INIT ====================
         document.addEventListener('DOMContentLoaded', function() {
             loadCart();
             renderCart();
+            setupRealtimeListener();
         });
     </script>
 </body>
