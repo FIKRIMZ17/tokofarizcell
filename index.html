@@ -12,13 +12,11 @@
         }
     </script>
     
-    <!-- LIBRARY PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <!-- FIREBASE MODULE -->
+    <script type="module" src="data.js"></script>
     
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Style tambahan untuk search di halaman utama */
         .search-hero {
             background: linear-gradient(145deg, #E6F0FA, #D4E4F5);
             padding: 25px 20px;
@@ -182,7 +180,6 @@
             border-radius: 30px;
         }
         
-        /* QUICK ACCESS - DIPERKECIL AGAR MUAT 5 TOMBOL */
         .quick-access {
             display: flex;
             justify-content: space-between;
@@ -513,11 +510,6 @@
             color: #666;
         }
         
-        .modal-btn.generate {
-            background: #1E7A5E;
-            color: white;
-        }
-        
         .modal-btn.pdf {
             background: #F18F01;
             color: white;
@@ -563,7 +555,7 @@
             </a>
         </div>
 
-        <!-- QUICK ACCESS (DENGAN TOMBOL PRICELIST) -->
+        <!-- QUICK ACCESS DENGAN PRICELIST -->
         <div class="quick-access">
             <a href="daftar-barang.html" class="quick-btn">📋 Barang</a>
             <a href="cek-harga.html" class="quick-btn">🔍 Cek Harga</a>
@@ -609,12 +601,10 @@
                 <h2>Buat Pricelist PDF</h2>
             </div>
             
-            <!-- SEARCH UNTUK FILTER BARANG -->
             <div class="pricelist-search">
                 <input type="text" id="pricelistSearch" placeholder="Cari barang..." onkeyup="filterPricelistItems()">
             </div>
             
-            <!-- SELECT ALL / DESELECT ALL -->
             <div class="select-all-bar">
                 <label>
                     <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()"> Pilih Semua
@@ -622,10 +612,8 @@
                 <span id="selectedCount" class="total-selected">0 barang dipilih</span>
             </div>
             
-            <!-- DAFTAR BARANG (AKAN DIISI JAVASCRIPT) -->
             <div id="pricelistItems" class="pricelist-items"></div>
             
-            <!-- TOMBOL AKSI -->
             <div class="modal-actions">
                 <button class="modal-btn cancel" onclick="tutupModalPricelist()">Batal</button>
                 <button class="modal-btn pdf" onclick="generatePDF()">📄 Buat PDF</button>
@@ -633,12 +621,12 @@
         </div>
     </div>
 
-    <script type="module" src="data.js"></script>
+    <script src="data.js"></script>
     <script>
         // ==================== VARIABEL ====================
         let suggestionTimeout = null;
         let cartItems = [];
-        let pricelistItems = []; // Untuk menyimpan data yang akan ditampilkan di modal
+        let pricelistItems = [];
 
         // ==================== LOAD CART ====================
         function loadCart() {
@@ -664,12 +652,12 @@
             const keyword = input.value.toLowerCase().trim();
             const suggestionBox = document.getElementById('suggestionBox');
             
-            if (keyword.length < 1) {
+            if (keyword.length < 1 || !window.daftarBarang) {
                 suggestionBox.classList.remove('show');
                 return;
             }
             
-            const hasil = daftarBarang
+            const hasil = window.daftarBarang
                 .filter(barang => barang.nama.toLowerCase().includes(keyword))
                 .sort((a, b) => {
                     const aStarts = a.nama.toLowerCase().startsWith(keyword);
@@ -758,12 +746,12 @@
             const container = document.getElementById('baruList');
             if (!container) return;
             
-            const terbaru = [...daftarBarang].reverse().slice(0, 3);
-            
-            if (terbaru.length === 0) {
+            if (!window.daftarBarang || window.daftarBarang.length === 0) {
                 container.innerHTML = '<p class="kosong">Belum ada barang</p>';
                 return;
             }
+            
+            const terbaru = [...window.daftarBarang].reverse().slice(0, 3);
             
             container.innerHTML = '';
             terbaru.forEach(barang => {
@@ -785,13 +773,25 @@
             const container = document.getElementById('populerList');
             if (!container) return;
             
-            const populer = daftarBarang.slice(0, 6).map(b => b.nama.split(' ')[0]);
+            if (!window.daftarBarang || window.daftarBarang.length === 0) {
+                const defaultPopuler = ['Beras', 'Gula', 'Minyak', 'Telur', 'Mie', 'Kopi'];
+                container.innerHTML = '';
+                defaultPopuler.slice(0, 6).forEach(item => {
+                    const span = document.createElement('span');
+                    span.className = 'populer-item';
+                    span.textContent = item;
+                    span.onclick = () => {
+                        window.location.href = `cek-harga.html?cari=${encodeURIComponent(item)}`;
+                    };
+                    container.appendChild(span);
+                });
+                return;
+            }
             
-            const defaultPopuler = ['Beras', 'Gula', 'Minyak', 'Telur', 'Mie', 'Kopi'];
-            const finalPopuler = populer.length > 0 ? populer : defaultPopuler;
+            const populer = window.daftarBarang.slice(0, 6).map(b => b.nama.split(' ')[0]);
             
             container.innerHTML = '';
-            finalPopuler.slice(0, 6).forEach(item => {
+            populer.slice(0, 6).forEach(item => {
                 const span = document.createElement('span');
                 span.className = 'populer-item';
                 span.textContent = item;
@@ -809,33 +809,25 @@
         }
 
         // ==================== MODAL PRICELIST ====================
-
-        // BUKA MODAL PRICELIST
         function bukaModalPricelist() {
-            // Load data barang ke modal
             loadPricelistItems();
             document.getElementById('modalPricelist').classList.add('show');
         }
 
-        // TUTUP MODAL PRICELIST
         function tutupModalPricelist() {
             document.getElementById('modalPricelist').classList.remove('show');
         }
 
-        // LOAD DATA BARANG KE MODAL
         function loadPricelistItems() {
             const container = document.getElementById('pricelistItems');
             
-            if (!daftarBarang || daftarBarang.length === 0) {
+            if (!window.daftarBarang || window.daftarBarang.length === 0) {
                 container.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">Belum ada data barang</p>';
                 return;
             }
             
-            // Ambil semua barang unik berdasarkan nama terbaru
             const barangUnik = new Map();
-            
-            // Urutkan dari terbaru
-            const sortedBarang = [...daftarBarang].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+            const sortedBarang = [...window.daftarBarang].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
             
             sortedBarang.forEach(barang => {
                 if (!barangUnik.has(barang.nama)) {
@@ -843,18 +835,15 @@
                 }
             });
             
-            // Konversi ke array dan urutkan berdasarkan nama
             pricelistItems = Array.from(barangUnik.values()).sort((a, b) => a.nama.localeCompare(b.nama));
             
             renderPricelistItems();
         }
 
-        // RENDER DAFTAR BARANG DI MODAL
         function renderPricelistItems() {
             const container = document.getElementById('pricelistItems');
             const searchKeyword = document.getElementById('pricelistSearch')?.value.toLowerCase().trim() || '';
             
-            // Filter berdasarkan pencarian
             let filteredItems = pricelistItems;
             if (searchKeyword) {
                 filteredItems = pricelistItems.filter(item => 
@@ -891,25 +880,19 @@
             
             container.innerHTML = html;
             updateSelectedCount();
-            
-            // Reset checkbox select all
             document.getElementById('selectAllCheckbox').checked = false;
         }
 
-        // FILTER PRICELIST ITEMS
         function filterPricelistItems() {
             renderPricelistItems();
         }
 
-        // TOGGLE SELECT ALL
         function toggleSelectAll() {
             const selectAll = document.getElementById('selectAllCheckbox').checked;
             const checkboxes = document.querySelectorAll('.item-checkbox');
             
             checkboxes.forEach(cb => {
                 cb.checked = selectAll;
-                
-                // Enable/disable input harga
                 const itemDiv = cb.closest('.pricelist-item');
                 const hargaInput = itemDiv.querySelector('.item-harga-jual');
                 hargaInput.disabled = !selectAll;
@@ -923,13 +906,11 @@
             updateSelectedCount();
         }
 
-        // UPDATE JUMLAH YANG DIPILIH
         function updateSelectedCount() {
             const checkboxes = document.querySelectorAll('.item-checkbox:checked');
             const count = checkboxes.length;
             document.getElementById('selectedCount').textContent = count + ' barang dipilih';
             
-            // Enable/disable input harga untuk checkbox yang dipilih
             document.querySelectorAll('.item-checkbox').forEach(cb => {
                 const itemDiv = cb.closest('.pricelist-item');
                 const hargaInput = itemDiv.querySelector('.item-harga-jual');
@@ -942,7 +923,6 @@
             });
         }
 
-        // GENERATE PDF
         function generatePDF() {
             const checkboxes = document.querySelectorAll('.item-checkbox:checked');
             
@@ -951,7 +931,6 @@
                 return;
             }
             
-            // Kumpulkan data yang dipilih
             const selectedItems = [];
             let hasEmptyPrice = false;
             
@@ -980,34 +959,30 @@
                 return;
             }
             
-            // Buat PDF
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            // Header
             doc.setFontSize(18);
-            doc.setTextColor(15, 76, 92); // #0F4C5C
+            doc.setTextColor(15, 76, 92);
             doc.text('TOKO FARIZ CELL', 14, 20);
             
             doc.setFontSize(12);
             doc.setTextColor(0, 0, 0);
             doc.text('Daftar Harga Jual', 14, 30);
             
-            // Tanggal
             const today = new Date();
             const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
             doc.setFontSize(10);
             doc.setTextColor(100, 100, 100);
             doc.text('Tanggal: ' + dateStr, 14, 38);
             
-            // Table
             doc.autoTable({
                 startY: 45,
                 head: [['Nama Barang', 'Modal', 'Harga Jual', 'Satuan']],
                 body: selectedItems.map(item => [item.nama, item.modal, item.hargaJual, item.satuan]),
                 theme: 'striped',
                 headStyles: {
-                    fillColor: [30, 122, 94], // #1E7A5E
+                    fillColor: [30, 122, 94],
                     textColor: 255,
                     fontSize: 11
                 },
@@ -1019,20 +994,19 @@
                 }
             });
             
-            // Footer
-            const pageCount = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) {
-                doc.setPage(i);
-                doc.setFontSize(10);
-                doc.setTextColor(150, 150, 150);
-                doc.text('Harga dapat berubah sewaktu-waktu', 14, doc.internal.pageSize.height - 10);
-            }
-            
-            // Download PDF
             doc.save('pricelist_tokofariz_' + today.toISOString().slice(0,10) + '.pdf');
-            
-            // Tutup modal
             tutupModalPricelist();
+        }
+
+        // ==================== REAL-TIME LISTENER ====================
+        function setupRealtimeListener() {
+            if (window.subscribeToBarang) {
+                window.subscribeToBarang(function(data) {
+                    console.log('🔄 Data berubah, refresh homepage');
+                    tampilkanBarangTerbaru();
+                    tampilkanPopuler();
+                });
+            }
         }
 
         // ==================== INIT ====================
@@ -1042,10 +1016,10 @@
             updateMiniKeranjang();
             tampilkanBarangTerbaru();
             tampilkanPopuler();
+            setupRealtimeListener();
             
             const searchInput = document.getElementById('searchInput');
             const searchBtn = document.getElementById('searchBtn');
-            const suggestionBox = document.getElementById('suggestionBox');
             
             searchBtn.addEventListener('click', cariBarang);
             
@@ -1061,11 +1035,14 @@
             });
             
             document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !suggestionBox.contains(e.target)) {
-                    suggestionBox.classList.remove('show');
+                if (!searchInput.contains(e.target) && !document.getElementById('suggestionBox').contains(e.target)) {
+                    document.getElementById('suggestionBox').classList.remove('show');
                 }
             });
         });
     </script>
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 </body>
 </html>
