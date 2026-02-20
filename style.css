@@ -1,0 +1,791 @@
+/* ====================================
+   TOKO FARIZ CELL - STYLE CSS
+   Orangtua Friendly - Kontras Tinggi
+   ==================================== */
+
+/* RESET & DASAR */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+body {
+    background-color: #F0F2F5;
+    padding: 15px;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 30px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* ====================================
+   HEADER
+   ==================================== */
+.header-simple {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #0F4C5C;
+}
+
+.header-simple h1 {
+    color: #0F4C5C;
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+}
+
+.date {
+    color: #2D3748;
+    font-size: 14px;
+    background: #E2E8F0;
+    padding: 6px 12px;
+    border-radius: 25px;
+    font-weight: 500;
+}
+
+/* ====================================
+   SEARCH HERO - FOKUS UTAMA
+   ==================================== */
+.search-hero {
+    background: linear-gradient(145deg, #E6F0FA, #D4E4F5);
+    padding: 25px 20px;
+    border-radius: 30px;
+    margin-bottom: 25px;
+    border: 2px solid #0F4C5C;
+    box-shadow: 0 4px 12px rgba(15, 76, 92, 0.2);
+}
+
+.search-hero h2 {
+    color: #0F4C5C;
+    font-size: 22px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 20px 15px;
+    font-size: 18px;
+    border: 3px solid #0F4C5C;
+    border-radius: 20px;
+    outline: none;
+    background: white;
+    font-weight: 500;
+}
+
+.search-box input:focus {
+    border-color: #1E7A5E;
+    box-shadow: 0 0 0 3px rgba(30, 122, 94, 0.3);
+}
+
+.search-btn {
+    background: #F18F01;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 0 30px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 2px solid #C87400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.search-btn:active {
+    transform: scale(0.95);
+    background: #C87400;
+}
+
+/* SARAN PENCARIAN */
+.saran-container {
+    background: white;
+    border-radius: 20px;
+    margin-top: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+    border: 2px solid #0F4C5C;
+    display: none;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.saran-item {
+    padding: 15px 20px;
+    border-bottom: 2px solid #E2E8F0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.saran-item:hover {
+    background: #0F4C5C;
+    color: white;
+}
+
+.saran-item:hover .saran-harga {
+    color: #F18F01;
+}
+
+.saran-nama {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.saran-harga {
+    color: #1E7A5E;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* ====================================
+   DUO TOMBOL UTAMA (KONTRAST TINGGI)
+   ==================================== */
+.duo-tombol {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.tombol-utama {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 22px 10px;
+    border-radius: 25px;
+    text-decoration: none;
+    color: white;
+    min-height: 130px;
+    justify-content: center;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    font-weight: bold;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+/* Rencana Belanja - Hijau Tua */
+.tombol-utama:first-child {
+    background: #1E7A5E;
+}
+
+/* Tambah Barang - Biru Tua */
+.tombol-utama:last-child {
+    background: #0F4C5C;
+}
+
+.tombol-utama:active {
+    transform: scale(0.97);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+
+.ikon {
+    font-size: 44px;
+    margin-bottom: 10px;
+    text-shadow: 3px 3px 5px rgba(0,0,0,0.3);
+}
+
+.teks {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.4);
+    letter-spacing: 0.5px;
+}
+
+.keterangan {
+    font-size: 13px;
+    opacity: 1;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.2);
+    padding: 3px 10px;
+    border-radius: 30px;
+}
+
+/* ====================================
+   QUICK ACCESS
+   ==================================== */
+.quick-access {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 25px;
+    gap: 8px;
+}
+
+.quick-btn {
+    background: #E2E8F0;
+    padding: 12px 8px;
+    border-radius: 40px;
+    text-decoration: none;
+    color: #0F4C5C;
+    font-weight: 600;
+    font-size: 15px;
+    flex: 1;
+    text-align: center;
+    border: 2px solid #0F4C5C;
+    transition: all 0.2s;
+}
+
+.quick-btn:active {
+    background: #0F4C5C;
+    color: white;
+}
+
+/* ====================================
+   POPULER / SERING DICARI
+   ==================================== */
+.sering-dicari-section {
+    margin-bottom: 25px;
+}
+
+.sering-dicari-section h3 {
+    color: #0F4C5C;
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: 600;
+    border-left: 5px solid #F18F01;
+    padding-left: 12px;
+}
+
+.populer-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.populer-item {
+    background: #FEF5E7;
+    padding: 12px 22px;
+    border-radius: 40px;
+    border: 2px solid #1E7A5E;
+    color: #1E7A5E;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.populer-item:active {
+    background: #1E7A5E;
+    color: white;
+}
+
+/* ====================================
+   MINI KERANJANG
+   ==================================== */
+.mini-keranjang {
+    background: #F8F9FA;
+    border-radius: 25px;
+    padding: 18px;
+    margin-bottom: 25px;
+    border: 2px solid #1E7A5E;
+    box-shadow: 0 4px 8px rgba(30, 122, 94, 0.2);
+}
+
+.mini-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-weight: bold;
+    color: #0F4C5C;
+    font-size: 18px;
+    padding-bottom: 5px;
+    border-bottom: 2px dashed #1E7A5E;
+}
+
+.lihat-link {
+    color: #F18F01;
+    text-decoration: none;
+    font-weight: 600;
+    background: #0F4C5C10;
+    padding: 4px 12px;
+    border-radius: 30px;
+}
+
+.kosong {
+    color: #718096;
+    font-style: italic;
+    text-align: center;
+    padding: 15px;
+    background: #EDF2F7;
+    border-radius: 15px;
+}
+
+/* ====================================
+   BARANG BARU DITAMBAHKAN
+   ==================================== */
+.baru-section h3 {
+    color: #0F4C5C;
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: 600;
+    border-left: 5px solid #F18F01;
+    padding-left: 12px;
+}
+
+.baru-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.baru-item {
+    background: white;
+    border: 2px solid #CBD5E0;
+    border-radius: 18px;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.baru-item strong {
+    color: #0F4C5C;
+}
+
+.baru-item span:last-child {
+    color: #F18F01;
+    font-weight: bold;
+    background: #0F4C5C10;
+    padding: 5px 12px;
+    border-radius: 30px;
+}
+
+/* ====================================
+   FOOTER
+   ==================================== */
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 18px;
+    border-top: 2px solid #CBD5E0;
+    color: #4A5568;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* ====================================
+   HALAMAN CEK HARGA
+   ==================================== */
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.back-btn {
+    background: #E2E8F0;
+    border: 2px solid #0F4C5C;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 24px;
+    color: #0F4C5C;
+    font-weight: bold;
+}
+
+.page-title {
+    color: #0F4C5C;
+    font-size: 22px;
+    font-weight: 600;
+    flex: 1;
+}
+
+.search-summary {
+    background: #EDF2F7;
+    padding: 15px;
+    border-radius: 18px;
+    margin-bottom: 20px;
+    border-left: 8px solid #F18F01;
+}
+
+.search-summary p {
+    font-size: 18px;
+    color: #2D3748;
+}
+
+.keyword-highlight {
+    background: #F18F01;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 40px;
+    font-weight: bold;
+}
+
+.result-item {
+    background: white;
+    border: 2px solid #E2E8F0;
+    border-radius: 25px;
+    padding: 18px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.result-nama {
+    font-size: 20px;
+    font-weight: bold;
+    color: #0F4C5C;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px dotted #CBD5E0;
+}
+
+.result-grosir {
+    background: #F0F4F8;
+    padding: 12px;
+    border-radius: 15px;
+    margin-bottom: 12px;
+}
+
+.result-grosir p {
+    font-size: 18px;
+    color: #2D3748;
+    font-weight: 600;
+}
+
+.result-ecer {
+    background: #FEF5E7;
+    padding: 12px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+.ecer-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #CBD5E0;
+    font-size: 16px;
+}
+
+.ecer-item:last-child {
+    border-bottom: none;
+}
+
+.ecer-satuan {
+    color: #1E7A5E;
+    font-weight: 600;
+}
+
+.ecer-harga {
+    font-weight: bold;
+    color: #F18F01;
+}
+
+.ecer-untung {
+    font-size: 14px;
+    color: #2D3748;
+}
+
+.result-tanggal {
+    font-size: 14px;
+    color: #718096;
+    margin: 12px 0 8px;
+}
+
+.btn-tambah-keranjang {
+    background: #1E7A5E;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 15px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    width: 100%;
+    cursor: pointer;
+    border: 2px solid #0F4C5C;
+    transition: all 0.2s;
+}
+
+.btn-tambah-keranjang:active {
+    background: #0F4C5C;
+    transform: scale(0.98);
+}
+
+.no-result {
+    text-align: center;
+    padding: 40px 20px;
+    background: #EDF2F7;
+    border-radius: 25px;
+    color: #4A5568;
+    font-size: 18px;
+}
+
+/* ====================================
+   FORM TAMBAH BARANG
+   ==================================== */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #0F4C5C;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 16px 15px;
+    border: 3px solid #CBD5E0;
+    border-radius: 18px;
+    font-size: 16px;
+    background: white;
+}
+
+.form-control:focus {
+    border-color: #1E7A5E;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 122, 94, 0.3);
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230F4C5C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 20px;
+}
+
+.satuan-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.satuan-row select {
+    width: 120px;
+}
+
+.harga-satuan-info {
+    background: #E6F0FA;
+    padding: 15px;
+    border-radius: 15px;
+    margin: 15px 0;
+    border-left: 6px solid #F18F01;
+}
+
+.harga-satuan-info p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #0F4C5C;
+}
+
+.btn-simpan {
+    background: #1E7A5E;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 18px;
+    font-size: 20px;
+    font-weight: bold;
+    width: 100%;
+    cursor: pointer;
+    border: 2px solid #0F4C5C;
+    margin: 20px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-simpan:active {
+    background: #0F4C5C;
+    transform: scale(0.98);
+}
+
+/* ====================================
+   TABEL DAFTAR BARANG
+   ==================================== */
+.kategori-group {
+    margin-bottom: 25px;
+}
+
+.kategori-title {
+    background: #0F4C5C;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 40px 40px 20px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.barang-item {
+    background: white;
+    border: 2px solid #E2E8F0;
+    border-radius: 18px;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.barang-nama {
+    font-weight: 600;
+    color: #2D3748;
+    font-size: 16px;
+}
+
+.barang-harga {
+    color: #1E7A5E;
+    font-weight: bold;
+    background: #E6F0FA;
+    padding: 5px 12px;
+    border-radius: 30px;
+}
+
+/* ====================================
+   RENCANA BELANJA (KERANJANG)
+   ==================================== */
+.keranjang-item {
+    background: white;
+    border: 2px solid #CBD5E0;
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.keranjang-info h4 {
+    color: #0F4C5C;
+    margin-bottom: 5px;
+}
+
+.keranjang-info p {
+    color: #4A5568;
+}
+
+.keranjang-total {
+    font-size: 24px;
+    font-weight: bold;
+    color: #F18F01;
+}
+
+.keranjang-aksi {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-hapus {
+    background: #E53E3E;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-kosongkan {
+    background: #718096;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 12px 20px;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.grand-total {
+    background: #0F4C5C;
+    color: white;
+    padding: 20px;
+    border-radius: 25px;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.grand-total h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.grand-total .total-nilai {
+    font-size: 36px;
+    font-weight: bold;
+    color: #F18F01;
+}
+
+/* ====================================
+   RESPONSIVE UNTUK HP KECIL
+   ==================================== */
+@media (max-width: 400px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .header-simple h1 {
+        font-size: 20px;
+    }
+    
+    .search-box input {
+        padding: 15px;
+        font-size: 16px;
+    }
+    
+    .search-btn {
+        padding: 0 15px;
+        font-size: 16px;
+    }
+    
+    .duo-tombol {
+        gap: 8px;
+    }
+    
+    .tombol-utama {
+        padding: 15px 5px;
+        min-height: 110px;
+    }
+    
+    .teks {
+        font-size: 16px;
+    }
+    
+    .keterangan {
+        font-size: 11px;
+    }
+    
+    .quick-btn {
+        font-size: 13px;
+        padding: 8px 4px;
+    }
+    
+    .populer-item {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}

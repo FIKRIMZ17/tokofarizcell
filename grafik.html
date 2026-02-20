@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>📊 Statistik - TOKO FARIZ CELL</title>
+    
+    <!-- CEK LOGIN -->
+    <script>
+        if (localStorage.getItem('tokofariz_auth') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card {
+            background: white;
+            border-radius: 25px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px solid #0F4C5C;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-title {
+            color: #0F4C5C;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed #CBD5E0;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            background: #F8F9FA;
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #1E7A5E;
+        }
+        
+        .stat-box .label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .stat-box .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #F18F01;
+        }
+        
+        .stat-box .unit {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 25px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px solid #0F4C5C;
+            height: 300px;
+        }
+        
+        .empty-data {
+            text-align: center;
+            padding: 60px 20px;
+            background: #EDF2F7;
+            border-radius: 25px;
+            color: #666;
+        }
+        
+        .empty-data p {
+            font-size: 18px;
+            margin: 15px 0;
+        }
+        
+        .btn-tambah {
+            background: #1E7A5E;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <a href="index.html" class="back-btn">◀</a>
+            <h1 class="page-title">📊 STATISTIK</h1>
+            <div style="width: 45px;"></div>
+        </div>
+        
+        <div id="statsContainer"></div>
+        
+        <div class="footer">
+            <p>Statistik belanja Bapak</p>
+        </div>
+    </div>
+    
+    <script type="module" src="data.js"></script>
+    <script>
+        function tampilkanStatistik() {
+            const container = document.getElementById('statsContainer');
+            
+            if (daftarBarang.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-data">
+                        <p style="font-size: 48px;">📊</p>
+                        <p>Belum ada data untuk ditampilkan</p>
+                        <p style="font-size: 14px;">Mulai input barang di halaman Tambah Barang</p>
+                        <a href="tambah.html" class="btn-tambah">➕ Tambah Barang</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // HITUNG STATISTIK
+            const totalBarang = daftarBarang.length;
+            const totalPengeluaran = daftarBarang.reduce((sum, b) => sum + b.modal, 0);
+            
+            // Barang paling sering dibeli
+            const freq = {};
+            daftarBarang.forEach(b => {
+                freq[b.nama] = (freq[b.nama] || 0) + 1;
+            });
+            
+            const sortedFreq = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+            const topBarang = sortedFreq.slice(0, 5);
+            
+            // Pengeluaran per kategori
+            const kategoriTotal = {};
+            daftarBarang.forEach(b => {
+                const kat = b.kategori || 'Lainnya';
+                kategoriTotal[kat] = (kategoriTotal[kat] || 0) + b.modal;
+            });
+            
+            // Agen paling sering
+            const agenFreq = {};
+            daftarBarang.forEach(b => {
+                if (b.agen && b.agen !== '-') {
+                    agenFreq[b.agen] = (agenFreq[b.agen] || 0) + 1;
+                }
+            });
+            
+            const topAgen = Object.entries(agenFreq).sort((a, b) => b[1] - a[1])[0];
+            
+            let html = `
+                <div class="stat-card">
+                    <div class="stat-title">📊 RINGKASAN</div>
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div class="label">Total Barang</div>
+                            <div class="value">${totalBarang}</div>
+                            <div class="unit">item</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">Total Modal</div>
+                            <div class="value">${formatRupiah(totalPengeluaran)}</div>
+                            <div class="unit"></div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">Rata-rata</div>
+                            <div class="value">${formatRupiah(totalPengeluaran / totalBarang)}</div>
+                            <div class="unit">/item</div>
+                        </div>
+                        ${topAgen ? `
+                        <div class="stat-box">
+                            <div class="label">Agen Terbanyak</div>
+                            <div class="value">${topAgen[0]}</div>
+                            <div class="unit">${topAgen[1]}x</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-title">📦 5 BARANG PALING SERING DIBELI</div>
+                    <div class="chart-container">
+                        <canvas id="barangChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-title">💰 PENGELUARAN PER KATEGORI</div>
+                    <div class="chart-container">
+                        <canvas id="kategoriChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-title">📈 TREN HARGA (10 TRANSAKSI TERAKHIR)</div>
+                    <div class="chart-container">
+                        <canvas id="hargaChart"></canvas>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Grafik Barang
+            new Chart(document.getElementById('barangChart'), {
+                type: 'bar',
+                data: {
+                    labels: topBarang.map(b => b[0]),
+                    datasets: [{
+                        label: 'Jumlah Pembelian',
+                        data: topBarang.map(b => b[1]),
+                        backgroundColor: '#F18F01',
+                        borderRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+            
+            // Grafik Kategori
+            const kategoriData = Object.entries(kategoriTotal).slice(0, 5);
+            new Chart(document.getElementById('kategoriChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: kategoriData.map(k => k[0]),
+                    datasets: [{
+                        data: kategoriData.map(k => k[1]),
+                        backgroundColor: ['#F18F01', '#1E7A5E', '#0F4C5C', '#E53E3E', '#805AD5'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => formatRupiah(ctx.raw)
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Grafik Tren Harga
+            const hargaData = daftarBarang.slice(-10).map(b => ({
+                tanggal: new Date(b.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
+                harga: b.modal / b.jumlahAngka
+            }));
+            
+            new Chart(document.getElementById('hargaChart'), {
+                type: 'line',
+                data: {
+                    labels: hargaData.map(h => h.tanggal),
+                    datasets: [{
+                        label: 'Harga Grosir',
+                        data: hargaData.map(h => h.harga),
+                        borderColor: '#1E7A5E',
+                        backgroundColor: '#1E7A5E20',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => 'Rp ' + ctx.raw.toLocaleString('id-ID')
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function formatRupiah(angka) {
+            return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+        }
+        
+        document.addEventListener('DOMContentLoaded', tampilkanStatistik);
+    </script>
+</body>
+</html>

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>➕ Tambah Barang - TOKO FARIZ CELL</title>
+    
+    <!-- CEK LOGIN -->
+    <script>
+        if (localStorage.getItem('tokofariz_auth') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .step-indicator {
+            display: flex;
+            margin-bottom: 20px;
+            background: #F0F4F8;
+            border-radius: 50px;
+            padding: 5px;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 50px;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .step.active {
+            background: #0F4C5C;
+            color: white;
+        }
+        
+        .date-selector {
+            background: #E6F0FA;
+            border-radius: 25px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 3px solid #0F4C5C;
+            text-align: center;
+        }
+        
+        .date-selector h3 {
+            color: #0F4C5C;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .date-input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .date-input-group label {
+            display: block;
+            font-weight: bold;
+            color: #0F4C5C;
+            margin-bottom: 8px;
+            font-size: 16px;
+            text-align: left;
+        }
+        
+        .date-input-group input {
+            width: 100%;
+            padding: 18px;
+            font-size: 18px;
+            border: 3px solid #CBD5E0;
+            border-radius: 20px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        
+        .date-input-group input:focus {
+            border-color: #F18F01;
+        }
+        
+        /* SUGGESTION BOX */
+        .suggestion-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 3px solid #0F4C5C;
+            border-radius: 20px;
+            margin-top: 5px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .suggestion-box.show {
+            display: block;
+        }
+        
+        .suggestion-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #E2E8F0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .suggestion-item:hover {
+            background: #E6F0FA;
+        }
+        
+        .suggestion-nama {
+            font-weight: bold;
+            color: #0F4C5C;
+        }
+        
+        .suggestion-kategori {
+            font-size: 12px;
+            color: #F18F01;
+            background: #FEF5E7;
+            padding: 3px 10px;
+            border-radius: 30px;
+        }
+        
+        .suggestion-count {
+            font-size: 12px;
+            color: #666;
+            background: #E2E8F0;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+        
+        .btn-lanjut {
+            background: #1E7A5E;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 18px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            border: 2px solid #0F4C5C;
+            margin-top: 10px;
+        }
+        
+        .btn-lanjut:active {
+            transform: scale(0.98);
+        }
+        
+        .form-container {
+            display: none;
+        }
+        
+        .form-container.show {
+            display: block;
+        }
+        
+        .info-tanggal {
+            background: #FEF5E7;
+            border-radius: 15px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid #F18F01;
+            flex-wrap: wrap;
+        }
+        
+        .info-tanggal span {
+            font-weight: bold;
+            color: #0F4C5C;
+        }
+        
+        .btn-ganti-tanggal {
+            background: #E2E8F0;
+            border: none;
+            border-radius: 30px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: auto;
+            font-weight: bold;
+        }
+        
+        .satuan-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .satuan-row select {
+            width: 120px;
+        }
+        
+        .info-harga {
+            background: #E6F0FA;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid #0F4C5C;
+        }
+        
+        .info-harga p {
+            margin: 5px 0;
+            font-size: 18px;
+        }
+        
+        .harga-besar {
+            font-size: 32px;
+            font-weight: bold;
+            color: #F18F01;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #0F4C5C;
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 3px solid #CBD5E0;
+            border-radius: 15px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .form-control:focus {
+            border-color: #F18F01;
+            outline: none;
+        }
+        
+        .btn-simpan {
+            background: #1E7A5E;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            border: 2px solid #0F4C5C;
+            margin: 20px 0;
+        }
+        
+        .btn-simpan:active {
+            transform: scale(0.98);
+        }
+        
+        .success-message {
+            background: #C6F6D5;
+            color: #22543D;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .error-message {
+            background: #FEEBC8;
+            color: #7B341E;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <a href="index.html" class="back-btn">◀</a>
+            <h1 class="page-title">➕ TAMBAH BARANG</h1>
+            <div style="width: 45px;"></div>
+        </div>
+
+        <!-- PESAN -->
+        <div id="successMessage" class="success-message"></div>
+        <div id="errorMessage" class="error-message"></div>
+
+        <!-- STEP INDICATOR -->
+        <div class="step-indicator">
+            <div class="step active" id="step1">1. Pilih Tanggal & Agen</div>
+            <div class="step" id="step2">2. Input Barang</div>
+        </div>
+
+        <!-- STEP 1: PILIH TANGGAL & AGEN -->
+        <div id="step1Container">
+            <div class="date-selector">
+                <h3>📅 Pilih Tanggal Belanja</h3>
+                
+                <div class="date-input-group">
+                    <label>Tanggal (dari bon lama)</label>
+                    <input type="date" id="tanggalInput" required>
+                </div>
+                
+                <div class="date-input-group" style="position: relative;">
+                    <label>🏪 Nama Agen (opsional)</label>
+                    <input type="text" id="agenInput" placeholder="Ketik nama agen..." autocomplete="off">
+                    
+                    <!-- SUGGESTION AGEN -->
+                    <div id="suggestionAgen" class="suggestion-box"></div>
+                </div>
+                
+                <button class="btn-lanjut" onclick="lanjutKeStep2()">LANJUTKAN ➔</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: INPUT BARANG -->
+        <div id="step2Container" class="form-container">
+            <!-- INFO TANGGAL & AGEN YANG DIPILIH -->
+            <div class="info-tanggal">
+                <span>📅</span>
+                <span id="tanggalTerpilih">-</span>
+                <span>🏪</span>
+                <span id="agenTerpilih">-</span>
+                <button class="btn-ganti-tanggal" onclick="kembaliKeStep1()">Ganti</button>
+            </div>
+
+            <form id="formTambahBarang">
+                <!-- NAMA BARANG (DENGAN SEARCH SUGGESTION) -->
+                <div class="form-group" style="position: relative;">
+                    <label>📝 Nama Barang</label>
+                    <input type="text" id="namaBarang" class="form-control" placeholder="Ketik nama barang..." autocomplete="off" required>
+                    
+                    <!-- SUGGESTION NAMA BARANG -->
+                    <div id="suggestionBarang" class="suggestion-box"></div>
+                    
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">*Saran akan muncul saat mengetik</p>
+                </div>
+
+                <!-- KATEGORI BARANG -->
+                <div class="form-group">
+                    <label>📁 Kategori Barang</label>
+                    <select id="kategoriBarang" class="form-control" required>
+                        <option value="">-- Pilih Kategori --</option>
+                    </select>
+                </div>
+
+                <!-- SATUAN BELI -->
+                <div class="form-group">
+                    <label>📦 Bapak beli dalam bentuk apa?</label>
+                    <select id="satuanBeliSelect" class="form-control" required>
+                        <option value="">-- Pilih Satuan --</option>
+                        <option value="Karung">👜 Karung</option>
+                        <option value="Dus">📦 Dus</option>
+                        <option value="Renceng">📋 Renceng</option>
+                        <option value="Pack">📦 Pack</option>
+                        <option value="Peti">📦 Peti</option>
+                        <option value="Botol">🍾 Botol</option>
+                        <option value="Kaleng">🥫 Kaleng</option>
+                        <option value="Bal">📦 Bal</option>
+                        <option value="Kg">⚖️ Kg</option>
+                        <option value="Liter">💧 Liter</option>
+                        <option value="Pcs">🔢 Pcs</option>
+                    </select>
+                </div>
+
+                <!-- JUMLAH BELI -->
+                <div class="form-group">
+                    <label>🔢 Berapa banyak?</label>
+                    <div class="satuan-row">
+                        <input type="number" id="jumlahAngka" class="form-control" placeholder="Contoh: 2" min="1" value="1" required style="flex: 2;">
+                        <select id="jumlahSatuan" class="form-control" style="flex: 1;">
+                            <option value="Karung">Karung</option>
+                            <option value="Dus">Dus</option>
+                            <option value="Renceng">Renceng</option>
+                            <option value="Pack">Pack</option>
+                            <option value="Peti">Peti</option>
+                            <option value="Botol">Botol</option>
+                            <option value="Kaleng">Kaleng</option>
+                            <option value="Bal">Bal</option>
+                            <option value="Kg">Kg</option>
+                            <option value="Liter">Liter</option>
+                            <option value="Pcs">Pcs</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ISI PER KEMASAN -->
+                <div class="form-group" id="groupIsiKemasan">
+                    <label>📦 Isi per kemasan (berapa ukuran isinya)?</label>
+                    <div class="satuan-row">
+                        <input type="number" id="isiKemasanAngka" class="form-control" placeholder="Contoh: 50" min="1" value="1" style="flex: 2;">
+                        <select id="isiKemasanSatuan" class="form-control" style="flex: 1;">
+                            <option value="Liter">Liter (untuk beras/minyak)</option>
+                            <option value="Kg">Kg (untuk tepung/gula)</option>
+                            <option value="Bungkus">Bungkus (untuk mie/snack)</option>
+                            <option value="Pcs">Pcs (untuk shampo/sabun)</option>
+                            <option value="Butir">Butir (untuk telur)</option>
+                            <option value="Batang">Batang (untuk rokok)</option>
+                            <option value="Sachet">Sachet (untuk kopi)</option>
+                            <option value="Botol">Botol (untuk minuman)</option>
+                            <option value="Kaleng">Kaleng (untuk susu)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- HARGA MODAL TOTAL -->
+                <div class="form-group">
+                    <label>💰 Harga Modal Total (Yang Bapak Bayar)</label>
+                    <input type="number" id="hargaModal" class="form-control" placeholder="Contoh: 84000" min="0" required>
+                </div>
+
+                <!-- INFO HARGA SATUAN -->
+                <div class="info-harga">
+                    <p>🔍 HARGA SATUAN MODAL:</p>
+                    <p class="harga-besar" id="hargaSatuan">Rp 0</p>
+                    <p id="keteranganSatuan" style="font-size: 14px; color: #666;">Pilih bentuk beli & isi dulu, Pak</p>
+                </div>
+
+                <!-- TOMBOL SIMPAN -->
+                <button type="submit" class="btn-simpan">💾 SIMPAN BARANG</button>
+            </form>
+        </div>
+
+        <div class="footer">
+            <p>Input barang setelah belanja, Pak 📝</p>
+        </div>
+    </div>
+
+    <script type="module" src="data.js"></script>
+    <script>
+        // ==================== VARIABEL ====================
+        let selectedTanggal = '';
+        let selectedAgen = '';
+        let suggestionTimeout = null;
+
+        // ==================== FUNGSI TAMPILAN PESAN ====================
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+        
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+
+        // ==================== STEP 1 FUNCTIONS ====================
+        
+        // SET DEFAULT TANGGAL (HARI INI)
+        function setDefaultTanggal() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('tanggalInput').value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        // LOAD KATEGORI KE DROPDOWN
+        function loadKategori() {
+            const select = document.getElementById('kategoriBarang');
+            select.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+            if (daftarKategori && daftarKategori.length > 0) {
+                daftarKategori.forEach(kat => {
+                    const option = document.createElement('option');
+                    option.value = kat;
+                    option.textContent = kat;
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        // FUNGSI SUGGESTION AGEN
+        function showAgenSuggestions() {
+            const input = document.getElementById('agenInput');
+            const keyword = input.value.toLowerCase().trim();
+            const suggestionBox = document.getElementById('suggestionAgen');
+            
+            if (keyword.length < 1) {
+                suggestionBox.classList.remove('show');
+                return;
+            }
+            
+            const agenCount = new Map();
+            if (daftarBarang && daftarBarang.length > 0) {
+                daftarBarang.forEach(barang => {
+                    if (barang.agen && barang.agen !== '-') {
+                        const count = agenCount.get(barang.agen) || 0;
+                        agenCount.set(barang.agen, count + 1);
+                    }
+                });
+            }
+            
+            const commonAgents = ['Agen Jaya', 'Agen Makmur', 'Pasar Tradisional', 'Indomaret', 'Alfamart'];
+            commonAgents.forEach(agen => {
+                if (!agenCount.has(agen)) {
+                    agenCount.set(agen, 0);
+                }
+            });
+            
+            const hasil = Array.from(agenCount.entries())
+                .filter(([agen, count]) => agen.toLowerCase().includes(keyword))
+                .sort((a, b) => {
+                    const aStarts = a[0].toLowerCase().startsWith(keyword);
+                    const bStarts = b[0].toLowerCase().startsWith(keyword);
+                    if (aStarts && !bStarts) return -1;
+                    if (!aStarts && bStarts) return 1;
+                    return b[1] - a[1];
+                })
+                .slice(0, 5);
+            
+            if (hasil.length === 0) {
+                suggestionBox.classList.remove('show');
+                return;
+            }
+            
+            let html = '';
+            hasil.forEach(([agen, count]) => {
+                const index = agen.toLowerCase().indexOf(keyword);
+                let namaDisplay = '';
+                
+                if (index >= 0) {
+                    namaDisplay = 
+                        agen.substring(0, index) +
+                        '<span style="background: #F18F01; color: white; padding: 2px 0;">' +
+                        agen.substring(index, index + keyword.length) +
+                        '</span>' +
+                        agen.substring(index + keyword.length);
+                } else {
+                    namaDisplay = agen;
+                }
+                
+                html += `
+                    <div class="suggestion-item" onclick="pilihAgen('${agen}')">
+                        <span class="suggestion-nama">${namaDisplay}</span>
+                        ${count > 0 ? `<span class="suggestion-count">${count}x</span>` : ''}
+                    </div>
+                `;
+            });
+            
+            suggestionBox.innerHTML = html;
+            suggestionBox.classList.add('show');
+        }
+
+        // PILIH AGEN DARI SUGGESTION
+        function pilihAgen(agen) {
+            document.getElementById('agenInput').value = agen;
+            document.getElementById('suggestionAgen').classList.remove('show');
+        }
+
+        // ==================== FITUR BARU: SUGGESTION NAMA BARANG ====================
+        
+        // FUNGSI SUGGESTION NAMA BARANG
+        function showBarangSuggestions() {
+            const input = document.getElementById('namaBarang');
+            const keyword = input.value.toLowerCase().trim();
+            const suggestionBox = document.getElementById('suggestionBarang');
+            
+            if (keyword.length < 1) {
+                suggestionBox.classList.remove('show');
+                return;
+            }
+            
+            if (!daftarBarang || daftarBarang.length === 0) {
+                suggestionBox.classList.remove('show');
+                return;
+            }
+            
+            // Ambil semua nama barang unik
+            const namaSet = new Map(); // nama -> { count, kategori terakhir }
+            
+            daftarBarang.forEach(barang => {
+                if (barang.nama) {
+                    const nama = barang.nama;
+                    if (!namaSet.has(nama)) {
+                        namaSet.set(nama, {
+                            count: 1,
+                            kategori: barang.kategori || 'Tanpa Kategori'
+                        });
+                    } else {
+                        const existing = namaSet.get(nama);
+                        existing.count++;
+                    }
+                }
+            });
+            
+            // Filter dan urutkan
+            const hasil = Array.from(namaSet.entries())
+                .filter(([nama, info]) => nama.toLowerCase().includes(keyword))
+                .sort((a, b) => {
+                    const aStarts = a[0].toLowerCase().startsWith(keyword);
+                    const bStarts = b[0].toLowerCase().startsWith(keyword);
+                    if (aStarts && !bStarts) return -1;
+                    if (!aStarts && bStarts) return 1;
+                    return b[1].count - a[1].count; // Urutkan berdasarkan frekuensi
+                })
+                .slice(0, 7);
+            
+            if (hasil.length === 0) {
+                suggestionBox.classList.remove('show');
+                return;
+            }
+            
+            let html = '';
+            hasil.forEach(([nama, info]) => {
+                const index = nama.toLowerCase().indexOf(keyword);
+                let namaDisplay = '';
+                
+                if (index >= 0) {
+                    namaDisplay = 
+                        nama.substring(0, index) +
+                        '<span style="background: #F18F01; color: white; padding: 2px 0;">' +
+                        nama.substring(index, index + keyword.length) +
+                        '</span>' +
+                        nama.substring(index + keyword.length);
+                } else {
+                    namaDisplay = nama;
+                }
+                
+                html += `
+                    <div class="suggestion-item" onclick="pilihNamaBarang('${nama.replace(/'/g, "\\'")}')">
+                        <span class="suggestion-nama">${namaDisplay}</span>
+                        <div>
+                            <span class="suggestion-kategori">${info.kategori}</span>
+                            <span class="suggestion-count" style="margin-left: 5px;">${info.count}x</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            suggestionBox.innerHTML = html;
+            suggestionBox.classList.add('show');
+        }
+
+        // PILIH NAMA BARANG DARI SUGGESTION
+        function pilihNamaBarang(nama) {
+            document.getElementById('namaBarang').value = nama;
+            document.getElementById('suggestionBarang').classList.remove('show');
+            
+            // Optional: Auto-fill kategori berdasarkan data terakhir
+            if (daftarBarang && daftarBarang.length > 0) {
+                // Cari data terakhir dengan nama ini
+                const lastItem = [...daftarBarang].reverse().find(b => b.nama === nama);
+                if (lastItem && lastItem.kategori) {
+                    const kategoriSelect = document.getElementById('kategoriBarang');
+                    // Set kategori jika ada
+                    const option = Array.from(kategoriSelect.options).find(opt => opt.value === lastItem.kategori);
+                    if (option) {
+                        kategoriSelect.value = lastItem.kategori;
+                    }
+                }
+            }
+        }
+
+        // ==================== STEP 2 FUNCTIONS ====================
+
+        // LANJUT KE STEP 2
+        function lanjutKeStep2() {
+            const tanggal = document.getElementById('tanggalInput').value;
+            const agen = document.getElementById('agenInput').value.trim();
+            
+            if (!tanggal) {
+                showError('⚠️ Pilih tanggal terlebih dahulu!');
+                return;
+            }
+            
+            selectedTanggal = tanggal;
+            selectedAgen = agen || '-';
+            
+            const date = new Date(tanggal);
+            const formattedDate = date.toLocaleDateString('id-ID', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            });
+            
+            document.getElementById('tanggalTerpilih').textContent = formattedDate;
+            document.getElementById('agenTerpilih').textContent = selectedAgen;
+            
+            document.getElementById('step1Container').style.display = 'none';
+            document.getElementById('step2Container').classList.add('show');
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+            
+            // Load kategori
+            loadKategori();
+        }
+
+        // KEMBALI KE STEP 1
+        function kembaliKeStep1() {
+            if (confirm('Kembali ke pemilihan tanggal? Data yang belum disimpan akan hilang.')) {
+                document.getElementById('step2Container').classList.remove('show');
+                document.getElementById('step1Container').style.display = 'block';
+                document.getElementById('step1').classList.add('active');
+                document.getElementById('step2').classList.remove('active');
+            }
+        }
+
+        // ATUR FORM BERDASARKAN SATUAN
+        function aturForm() {
+            const satuan = document.getElementById('satuanBeliSelect').value;
+            const jumlahSatuan = document.getElementById('jumlahSatuan');
+            
+            jumlahSatuan.value = satuan;
+            
+            const isiSatuan = document.getElementById('isiKemasanSatuan');
+            
+            if (satuan === 'Karung') {
+                isiSatuan.value = 'Liter';
+            } else if (satuan === 'Dus') {
+                isiSatuan.value = 'Bungkus';
+            } else if (satuan === 'Renceng') {
+                isiSatuan.value = 'Pcs';
+            } else if (satuan === 'Peti') {
+                isiSatuan.value = 'Butir';
+            } else if (satuan === 'Botol') {
+                isiSatuan.value = 'Liter';
+            }
+            
+            hitungHarga();
+        }
+
+        // HITUNG HARGA SATUAN
+        function hitungHarga() {
+            const modal = parseFloat(document.getElementById('hargaModal').value) || 0;
+            const satuanBeli = document.getElementById('satuanBeliSelect').value;
+            const jumlahAngka = parseFloat(document.getElementById('jumlahAngka').value) || 1;
+            const isiKemasan = parseFloat(document.getElementById('isiKemasanAngka').value) || 1;
+            
+            if (!satuanBeli) {
+                document.getElementById('hargaSatuan').textContent = 'Rp 0';
+                document.getElementById('keteranganSatuan').textContent = 'Pilih dulu bentuk belinya, Pak';
+                return;
+            }
+            
+            const totalUnit = jumlahAngka * isiKemasan;
+            const harga = modal / totalUnit;
+            
+            if (modal > 0 && totalUnit > 0) {
+                const satuanText = document.getElementById('isiKemasanSatuan').value;
+                document.getElementById('hargaSatuan').textContent = formatRupiah(harga);
+                document.getElementById('keteranganSatuan').textContent = `per ${satuanText}`;
+            } else {
+                document.getElementById('hargaSatuan').textContent = 'Rp 0';
+                document.getElementById('keteranganSatuan').textContent = 'Isi harga modal dulu, Pak';
+            }
+        }
+
+        // SIMPAN BARANG
+        function simpanBarang(e) {
+            e.preventDefault();
+            
+            const nama = document.getElementById('namaBarang').value.trim();
+            const kategori = document.getElementById('kategoriBarang').value;
+            const satuanBeli = document.getElementById('satuanBeliSelect').value;
+            const jumlahAngka = parseFloat(document.getElementById('jumlahAngka').value);
+            const jumlahSatuan = document.getElementById('jumlahSatuan').value;
+            const isiAngka = parseFloat(document.getElementById('isiKemasanAngka').value) || 1;
+            const isiSatuan = document.getElementById('isiKemasanSatuan').value;
+            const modal = parseFloat(document.getElementById('hargaModal').value);
+            
+            if (!nama || !kategori || !satuanBeli || !modal) {
+                showError('⚠️ Nama, kategori, bentuk beli, dan harga modal harus diisi!');
+                return;
+            }
+            
+            const totalUnit = jumlahAngka * isiAngka;
+            const catatan = `${jumlahAngka} ${satuanBeli} @ ${isiAngka} ${isiSatuan}`;
+            
+            const barangBaru = {
+                id: 'barang_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                nama: nama,
+                kategori: kategori,
+                agen: selectedAgen,
+                tanggal: selectedTanggal,
+                satuanBeli: satuanBeli,
+                jumlahAngka: jumlahAngka,
+                jumlahSatuan: jumlahSatuan,
+                isiAngka: isiAngka,
+                isiSatuan: isiSatuan,
+                modal: modal,
+                totalUnit: totalUnit,
+                catatan: catatan
+            };
+            
+            // Tambah ke array
+            daftarBarang.push(barangBaru);
+            
+            // Simpan ke localStorage
+            simpanData();
+            
+            showSuccess('✅ Barang berhasil disimpan!');
+            
+            // Reset form
+            document.getElementById('namaBarang').value = '';
+            document.getElementById('hargaModal').value = '';
+            document.getElementById('jumlahAngka').value = '1';
+            document.getElementById('isiKemasanAngka').value = '1';
+            document.getElementById('satuanBeliSelect').value = '';
+            document.getElementById('kategoriBarang').value = '';
+            
+            document.getElementById('hargaSatuan').textContent = 'Rp 0';
+            document.getElementById('keteranganSatuan').textContent = 'Pilih bentuk beli & isi dulu, Pak';
+        }
+
+        function formatRupiah(angka) {
+            return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            setDefaultTanggal();
+            
+            // SUGGESTION AGEN
+            const agenInput = document.getElementById('agenInput');
+            agenInput.addEventListener('input', function() {
+                clearTimeout(suggestionTimeout);
+                suggestionTimeout = setTimeout(showAgenSuggestions, 200);
+            });
+            
+            // SUGGESTION NAMA BARANG (FITUR BARU)
+            const namaBarangInput = document.getElementById('namaBarang');
+            namaBarangInput.addEventListener('input', function() {
+                clearTimeout(suggestionTimeout);
+                suggestionTimeout = setTimeout(showBarangSuggestions, 200);
+            });
+            
+            namaBarangInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
+            
+            // CLICK OUTSIDE untuk menutup suggestion
+            document.addEventListener('click', function(e) {
+                const namaInput = document.getElementById('namaBarang');
+                const suggestionBarang = document.getElementById('suggestionBarang');
+                const agenInput = document.getElementById('agenInput');
+                const suggestionAgen = document.getElementById('suggestionAgen');
+                
+                if (namaInput && !namaInput.contains(e.target) && !suggestionBarang.contains(e.target)) {
+                    suggestionBarang.classList.remove('show');
+                }
+                
+                if (agenInput && !agenInput.contains(e.target) && !suggestionAgen.contains(e.target)) {
+                    suggestionAgen.classList.remove('show');
+                }
+            });
+            
+            // Event listeners untuk form
+            document.getElementById('satuanBeliSelect').addEventListener('change', aturForm);
+            document.getElementById('hargaModal').addEventListener('input', hitungHarga);
+            document.getElementById('jumlahAngka').addEventListener('input', hitungHarga);
+            document.getElementById('isiKemasanAngka').addEventListener('input', hitungHarga);
+            document.getElementById('isiKemasanSatuan').addEventListener('change', hitungHarga);
+            document.getElementById('formTambahBarang').addEventListener('submit', simpanBarang);
+        });
+    </script>
+</body>
+</html>

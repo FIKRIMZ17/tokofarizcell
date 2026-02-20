@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>📋 Daftar Barang - TOKO FARIZ CELL</title>
+    
+    <!-- CEK LOGIN -->
+    <script>
+        if (localStorage.getItem('tokofariz_auth') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* TAMPILAN GROUP */
+        .product-group {
+            background: white;
+            border: 2px solid #0F4C5C;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .group-header {
+            background: #0F4C5C;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .group-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .group-nama {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .group-count {
+            background: #F18F01;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 30px;
+            font-size: 14px;
+        }
+        
+        .group-header-right {
+            font-size: 24px;
+            transition: transform 0.3s;
+        }
+        
+        .group-header.open .group-header-right {
+            transform: rotate(180deg);
+        }
+        
+        .group-content {
+            display: none;
+            padding: 15px;
+            background: #F8F9FA;
+        }
+        
+        .group-content.show {
+            display: block;
+        }
+        
+        /* VERSI BARANG (RIWAYAT) */
+        .history-item {
+            background: white;
+            border: 2px solid #E2E8F0;
+            border-radius: 18px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .history-info {
+            flex: 2;
+            min-width: 250px;
+        }
+        
+        .history-tanggal {
+            font-size: 14px;
+            color: #0F4C5C;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .history-detail {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .history-harga {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .harga-ecer-history {
+            color: #1E7A5E;
+            font-weight: bold;
+        }
+        
+        .harga-grosir-history {
+            color: #F18F01;
+            font-weight: bold;
+        }
+        
+        .history-agen {
+            background: #E2E8F0;
+            padding: 3px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        
+        /* PERBANDINGAN HARGA */
+        .comparison-badge {
+            background: #FEF5E7;
+            border: 2px solid #F18F01;
+            border-radius: 15px;
+            padding: 10px 15px;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .comparison-title {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .comparison-agen {
+            font-weight: bold;
+            color: #0F4C5C;
+            margin-bottom: 3px;
+        }
+        
+        .comparison-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1E7A5E;
+        }
+        
+        .comparison-savings {
+            font-size: 12px;
+            color: #E53E3E;
+            font-weight: bold;
+        }
+        
+        .no-comparison {
+            background: #EDF2F7;
+            border: 2px dashed #CBD5E0;
+            border-radius: 15px;
+            padding: 10px 15px;
+            min-width: 200px;
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        /* TOMBOL EDIT */
+        .edit-button-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-edit-item {
+            background: #F18F01;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        
+        .btn-edit-item:active {
+            transform: scale(0.9);
+        }
+        
+        .btn-delete-item {
+            background: #E53E3E;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        
+        .btn-delete-item:active {
+            transform: scale(0.9);
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 3px solid #0F4C5C;
+            border-radius: 30px;
+            outline: none;
+        }
+        
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            flex: 2;
+            min-width: 150px;
+            padding: 12px;
+            border: 3px solid #0F4C5C;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #0F4C5C;
+            background: white;
+        }
+        
+        .btn-action {
+            flex: 1;
+            min-width: 120px;
+            background: #1E7A5E;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            border: 2px solid #0F4C5C;
+        }
+        
+        .btn-action.orange {
+            background: #F18F01;
+        }
+        
+        .btn-action.red {
+            background: #E53E3E;
+        }
+        
+        .export-import-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #EDF2F7;
+            border-radius: 25px;
+            color: #666;
+        }
+        
+        .success-message {
+            background: #C6F6D5;
+            color: #22543D;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .error-message {
+            background: #FEEBC8;
+            color: #7B341E;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        /* MODAL EDIT */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-box {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.2s;
+            border: 3px solid #F18F01;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-overlay.show .modal-box {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #CBD5E0;
+        }
+        
+        .modal-header-icon {
+            background: #0F4C5C;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .modal-header h2 {
+            color: #0F4C5C;
+            font-size: 22px;
+            flex: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #0F4C5C;
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 3px solid #CBD5E0;
+            border-radius: 15px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .form-control:focus {
+            border-color: #F18F01;
+            outline: none;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .modal-btn.cancel {
+            background: #E2E8F0;
+            color: #666;
+        }
+        
+        .modal-btn.save {
+            background: #1E7A5E;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <a href="index.html" class="back-btn">◀</a>
+            <h1 class="page-title">📋 DAFTAR BARANG</h1>
+            <div style="width: 45px;"></div>
+        </div>
+
+        <!-- PESAN -->
+        <div id="successMessage" class="success-message"></div>
+        <div id="errorMessage" class="error-message"></div>
+
+        <!-- SEARCH -->
+        <div class="search-box">
+            <input type="text" id="searchBarang" placeholder="Cari barang...">
+        </div>
+
+        <!-- FILTER KATEGORI -->
+        <div class="filter-bar">
+            <select id="filterKategori" class="filter-select">
+                <option value="semua">Semua Kategori</option>
+            </select>
+        </div>
+
+        <!-- EXPORT/IMPORT BUTTONS -->
+        <div class="export-import-bar">
+            <button class="btn-action" onclick="exportData()">💾 Backup JSON</button>
+            <button class="btn-action orange" onclick="exportToExcel()">📊 Export Excel</button>
+            
+            <label for="importJson" class="btn-action" style="background: #F18F01; text-align: center; cursor: pointer;">📂 Restore JSON</label>
+            <input type="file" id="importJson" accept=".json" style="display: none;" onchange="handleImportJson(this)">
+            
+            <label for="importExcel" class="btn-action" style="background: #E53E3E; text-align: center; cursor: pointer;">📗 Import Excel</label>
+            <input type="file" id="importExcel" accept=".csv" style="display: none;" onchange="handleImportExcel(this)">
+        </div>
+
+        <!-- DAFTAR BARANG (GROUP) -->
+        <div id="daftarContainer"></div>
+
+        <div class="footer">
+            <p>Daftar barang dengan perbandingan harga antar agen</p>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT -->
+    <div id="modalEdit" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-header-icon">✏️</div>
+                <h2>Edit Barang</h2>
+            </div>
+            
+            <form id="formEdit" onsubmit="event.preventDefault(); simpanEdit();">
+                <input type="hidden" id="editId">
+                
+                <div class="form-group">
+                    <label>Nama Barang</label>
+                    <input type="text" id="editNama" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <select id="editKategori" class="form-control" required>
+                        <option value="">-- Pilih Kategori --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Harga Modal (Rp)</label>
+                    <input type="number" id="editHarga" class="form-control" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Catatan / Keterangan</label>
+                    <input type="text" id="editCatatan" class="form-control" placeholder="Contoh: 2 dus @ 40 bungkus">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn cancel" onclick="tutupModalEdit()">Batal</button>
+                    <button type="submit" class="modal-btn save">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="data.js"></script>
+    <script>
+        // ==================== VARIABEL ====================
+        let currentEditId = null;
+
+        // ==================== FUNGSI TAMPILAN PESAN ====================
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+        
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+
+        // ==================== FUNGSI UTAMA ====================
+
+        // LOAD FILTER KATEGORI
+        function loadFilterKategori() {
+            const select = document.getElementById('filterKategori');
+            const kategoriSet = new Set();
+            
+            if (daftarBarang && daftarBarang.length > 0) {
+                daftarBarang.forEach(barang => {
+                    if (barang.kategori) kategoriSet.add(barang.kategori);
+                });
+            }
+            
+            const kategoriList = Array.from(kategoriSet).sort();
+            
+            select.innerHTML = '<option value="semua">Semua Kategori</option>';
+            kategoriList.forEach(kat => {
+                const option = document.createElement('option');
+                option.value = kat;
+                option.textContent = kat;
+                select.appendChild(option);
+            });
+        }
+
+        // FUNGSI UNTUK MENDAPATKAN AGEN TERMURAH
+        function getTermurah(versions) {
+            if (!versions || versions.length < 2) return null;
+            
+            // Urutkan berdasarkan harga grosir termurah
+            const sorted = [...versions].sort((a, b) => {
+                const hargaA = a.modal / a.jumlahAngka;
+                const hargaB = b.modal / b.jumlahAngka;
+                return hargaA - hargaB;
+            });
+            
+            const termurah = sorted[0];
+            const termahal = sorted[sorted.length - 1];
+            
+            const hargaTermurah = termurah.modal / termurah.jumlahAngka;
+            const hargaTermahal = termahal.modal / termahal.jumlahAngka;
+            const selisih = hargaTermahal - hargaTermurah;
+            const persen = ((selisih / hargaTermurah) * 100).toFixed(1);
+            
+            return {
+                agen: termurah.agen || 'Agen',
+                harga: hargaTermurah,
+                selisih: selisih,
+                persen: persen
+            };
+        }
+
+        // TAMPILKAN DAFTAR BARANG (GROUP BY NAMA)
+        function tampilkanDaftarBarang() {
+            const keyword = document.getElementById('searchBarang').value.toLowerCase().trim();
+            const filterKategori = document.getElementById('filterKategori').value;
+            const container = document.getElementById('daftarContainer');
+            
+            if (!daftarBarang || daftarBarang.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p style="font-size: 48px;">📭</p>
+                        <p>Belum ada data barang</p>
+                        <p style="font-size: 14px; margin-top: 10px;">Klik Tambah Barang untuk memulai</p>
+                        <a href="tambah.html" style="display: inline-block; margin-top: 15px; background: #1E7A5E; color: white; padding: 12px 25px; border-radius: 30px; text-decoration: none; font-weight: bold;">➕ Tambah Barang</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Filter barang
+            let barangFilter = [...daftarBarang];
+            
+            if (keyword) {
+                barangFilter = barangFilter.filter(b => 
+                    (b.nama && b.nama.toLowerCase().includes(keyword)) || 
+                    (b.kategori && b.kategori.toLowerCase().includes(keyword)) ||
+                    (b.agen && b.agen.toLowerCase().includes(keyword))
+                );
+            }
+            
+            if (filterKategori !== 'semua') {
+                barangFilter = barangFilter.filter(b => b.kategori === filterKategori);
+            }
+            
+            if (barangFilter.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">Tidak ada barang yang cocok</p>';
+                return;
+            }
+            
+            // GROUP BY NAMA BARANG
+            const groupMap = new Map();
+            barangFilter.forEach(barang => {
+                if (!groupMap.has(barang.nama)) {
+                    groupMap.set(barang.nama, []);
+                }
+                groupMap.get(barang.nama).push(barang);
+            });
+            
+            // Urutkan grup berdasarkan nama
+            const groupEntries = Array.from(groupMap.entries()).sort((a, b) => 
+                a[0].localeCompare(b[0])
+            );
+            
+            let html = '';
+            groupEntries.forEach(([nama, versions]) => {
+                // Urutkan versi dari yang terbaru
+                versions.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+                
+                // Kategori (ambil dari versi terbaru)
+                const kategori = versions[0].kategori || '-';
+                const totalVersions = versions.length;
+                
+                // Cari agen termurah
+                const termurah = getTermurah(versions);
+                
+                html += `
+                    <div class="product-group">
+                        <div class="group-header" onclick="toggleGroup(this)">
+                            <div class="group-header-left">
+                                <span class="group-nama">${nama}</span>
+                                <span class="group-count">${totalVersions} riwayat</span>
+                                <span style="background: #F18F01; color: white; padding: 3px 10px; border-radius: 30px; font-size: 12px;">${kategori}</span>
+                            </div>
+                            <div class="group-header-right">▼</div>
+                        </div>
+                        <div class="group-content">
+                `;
+                
+                // Tampilkan semua versi
+                versions.forEach((barang, index) => {
+                    const hargaEcer = barang.modal / barang.totalUnit;
+                    const hargaGrosir = barang.modal / barang.jumlahAngka;
+                    
+                    let satuanEcer = barang.isiSatuan || barang.jumlahSatuan || 'unit';
+                    let satuanGrosir = barang.satuanBeli || 'kemasan';
+                    
+                    // Logic khusus (sama seperti di cek harga)
+                    if (barang.nama && barang.nama.toLowerCase().includes('rokok')) {
+                        satuanEcer = 'batang';
+                        satuanGrosir = barang.satuanBeli === 'Renceng' ? 'slop' : 'bungkus';
+                    }
+                    
+                    html += `
+                        <div class="history-item" id="item-${barang.id}">
+                            <div class="edit-button-container">
+                                <button class="btn-edit-item" onclick="bukaModalEdit('${barang.id}')" title="Edit barang">✏️</button>
+                                <button class="btn-delete-item" onclick="hapusBarang('${barang.id}')" title="Hapus barang">🗑️</button>
+                            </div>
+                            
+                            <div class="history-info">
+                                <div class="history-tanggal">📅 ${formatTanggal(barang.tanggal)}</div>
+                                <div class="history-detail">
+                                    <span class="history-harga">
+                                        <span class="harga-ecer-history">${formatRupiah(hargaEcer)}/${satuanEcer}</span>
+                                        <span class="harga-grosir-history">${formatRupiah(hargaGrosir)}/${satuanGrosir}</span>
+                                    </span>
+                                    <span class="history-agen">🏪 ${barang.agen || 'Agen'}</span>
+                                </div>
+                            </div>
+                    `;
+                    
+                    // TAMPILKAN PERBANDINGAN HARGA
+                    if (index === 0) {
+                        if (termurah) {
+                            const hemat = ((versions[0].modal / versions[0].jumlahAngka) - termurah.harga).toFixed(0);
+                            html += `
+                                <div class="comparison-badge">
+                                    <div class="comparison-title">💡 Termurah di</div>
+                                    <div class="comparison-agen">${termurah.agen}</div>
+                                    <div class="comparison-price">${formatRupiah(termurah.harga)}</div>
+                                    ${hemat > 0 ? 
+                                        `<div class="comparison-savings">Hemat ${formatRupiah(hemat)} (${termurah.persen}%)</div>` : 
+                                        `<div class="comparison-savings" style="color: #1E7A5E;">Harga terendah</div>`
+                                    }
+                                </div>
+                            `;
+                        } else {
+                            html += `
+                                <div class="no-comparison">
+                                    Hanya 1 agen
+                                </div>
+                            `;
+                        }
+                    } else {
+                        // Untuk versi lainnya, tampilkan perbandingan dengan yang sekarang
+                        const hargaSekarang = versions[0].modal / versions[0].jumlahAngka;
+                        const hargaIni = barang.modal / barang.jumlahAngka;
+                        const selisih = hargaSekarang - hargaIni;
+                        
+                        if (selisih > 0) {
+                            html += `
+                                <div class="no-comparison" style="border-color: #1E7A5E;">
+                                    <span style="color: #1E7A5E;">⬆️ ${formatRupiah(selisih)} lebih murah</span>
+                                </div>
+                            `;
+                        } else if (selisih < 0) {
+                            html += `
+                                <div class="no-comparison" style="border-color: #E53E3E;">
+                                    <span style="color: #E53E3E;">⬇️ ${formatRupiah(Math.abs(selisih))} lebih mahal</span>
+                                </div>
+                            `;
+                        } else {
+                            html += `
+                                <div class="no-comparison">
+                                    Harga sama
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    html += `</div>`;
+                });
+                
+                html += `</div></div>`;
+            });
+            
+            container.innerHTML = html;
+            
+            // Buka grup pertama secara otomatis
+            const firstGroup = document.querySelector('.group-content');
+            if (firstGroup) {
+                firstGroup.classList.add('show');
+                const firstHeader = document.querySelector('.group-header');
+                if (firstHeader) firstHeader.classList.add('open');
+            }
+        }
+
+        // TOGGLE GROUP (buka/tutup)
+        function toggleGroup(header) {
+            header.classList.toggle('open');
+            const content = header.nextElementSibling;
+            content.classList.toggle('show');
+        }
+
+        // ==================== FUNGSI EDIT ====================
+
+        // BUKA MODAL EDIT
+        function bukaModalEdit(id) {
+            const barang = daftarBarang.find(b => b.id === id);
+            if (!barang) {
+                showError('Barang tidak ditemukan');
+                return;
+            }
+            
+            currentEditId = id;
+            
+            document.getElementById('editId').value = id;
+            document.getElementById('editNama').value = barang.nama || '';
+            document.getElementById('editHarga').value = barang.modal || 0;
+            document.getElementById('editCatatan').value = barang.catatan || '';
+            
+            // Load kategori
+            const selectKategori = document.getElementById('editKategori');
+            selectKategori.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+            
+            if (daftarKategori && daftarKategori.length > 0) {
+                daftarKategori.forEach(kat => {
+                    const option = document.createElement('option');
+                    option.value = kat;
+                    option.textContent = kat;
+                    if (kat === barang.kategori) {
+                        option.selected = true;
+                    }
+                    selectKategori.appendChild(option);
+                });
+            }
+            
+            document.getElementById('modalEdit').classList.add('show');
+        }
+
+        // TUTUP MODAL EDIT
+        function tutupModalEdit() {
+            document.getElementById('modalEdit').classList.remove('show');
+            currentEditId = null;
+        }
+
+        // SIMPAN EDIT
+        function simpanEdit() {
+            const id = document.getElementById('editId').value;
+            const nama = document.getElementById('editNama').value.trim();
+            const kategori = document.getElementById('editKategori').value;
+            const harga = parseFloat(document.getElementById('editHarga').value);
+            const catatan = document.getElementById('editCatatan').value.trim();
+            
+            if (!nama || !kategori || !harga) {
+                showError('Nama, kategori, dan harga harus diisi');
+                return;
+            }
+            
+            // Cari index barang
+            const index = daftarBarang.findIndex(b => b.id === id);
+            if (index === -1) {
+                showError('Barang tidak ditemukan');
+                tutupModalEdit();
+                return;
+            }
+            
+            // Update data
+            daftarBarang[index].nama = nama;
+            daftarBarang[index].kategori = kategori;
+            daftarBarang[index].modal = harga;
+            daftarBarang[index].catatan = catatan;
+            
+            // Simpan ke localStorage
+            simpanData();
+            
+            // Refresh tampilan
+            loadFilterKategori();
+            tampilkanDaftarBarang();
+            tutupModalEdit();
+            
+            showSuccess('✅ Barang berhasil diupdate');
+        }
+
+        // ==================== FUNGSI HAPUS ====================
+
+        // HAPUS BARANG
+        function hapusBarang(id) {
+            if (!confirm('Yakin hapus barang ini?')) return;
+            
+            const index = daftarBarang.findIndex(b => b.id === id);
+            if (index === -1) {
+                showError('Barang tidak ditemukan');
+                return;
+            }
+            
+            // Hapus dari array
+            daftarBarang.splice(index, 1);
+            
+            // Simpan ke localStorage
+            simpanData();
+            
+            // Refresh tampilan
+            loadFilterKategori();
+            tampilkanDaftarBarang();
+            
+            showSuccess('✅ Barang berhasil dihapus');
+        }
+
+        // ==================== FUNGSI EXPORT/IMPORT ====================
+
+        function handleImportJson(input) {
+            if (input.files && input.files[0]) {
+                importData(input.files[0]).then((result) => {
+                    loadFilterKategori();
+                    tampilkanDaftarBarang();
+                    input.value = '';
+                    showSuccess('✅ Import JSON berhasil');
+                }).catch(err => {
+                    showError('Gagal import: ' + err);
+                    input.value = '';
+                });
+            }
+        }
+
+        function handleImportExcel(input) {
+            if (input.files && input.files[0]) {
+                importFromExcel(input.files[0]).then((result) => {
+                    loadFilterKategori();
+                    tampilkanDaftarBarang();
+                    input.value = '';
+                    showSuccess('✅ Import Excel berhasil');
+                }).catch(err => {
+                    showError('Gagal import Excel: ' + err);
+                    input.value = '';
+                });
+            }
+        }
+
+        // ==================== FUNGSI BANTU ====================
+
+        function formatRupiah(angka) {
+            if (!angka) return 'Rp 0';
+            return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+        }
+
+        function formatTanggal(tanggal) {
+            if (!tanggal) return '-';
+            try {
+                const date = new Date(tanggal);
+                return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+            } catch (e) {
+                return '-';
+            }
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pastikan data sudah diload
+            setTimeout(() => {
+                loadFilterKategori();
+                tampilkanDaftarBarang();
+            }, 100);
+            
+            document.getElementById('searchBarang').addEventListener('keyup', function() {
+                tampilkanDaftarBarang();
+            });
+            
+            document.getElementById('filterKategori').addEventListener('change', function() {
+                tampilkanDaftarBarang();
+            });
+        });
+    </script>
+</body>
+</html>

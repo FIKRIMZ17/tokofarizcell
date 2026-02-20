@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>🔍 Cek Harga - TOKO FARIZ CELL</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .search-box-page {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .search-box-page input {
+            flex: 1;
+            padding: 18px 15px;
+            font-size: 18px;
+            border: 3px solid #0F4C5C;
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .search-box-page button {
+            background: #F18F01;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 0 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .suggestion-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 3px solid #0F4C5C;
+            border-radius: 20px;
+            margin-top: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .suggestion-box.show {
+            display: block;
+        }
+        
+        .suggestion-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #E2E8F0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .suggestion-item:hover {
+            background: #E6F0FA;
+        }
+        
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background: #E2E8F0;
+            border: 2px solid #CBD5E0;
+            border-radius: 30px;
+            padding: 8px 16px;
+            font-weight: 600;
+            color: #0F4C5C;
+            cursor: pointer;
+        }
+        
+        .filter-btn.active {
+            background: #0F4C5C;
+            color: white;
+            border-color: #F18F01;
+        }
+        
+        /* LIST PRODUK - TAMPILAN SEJAJAR */
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+            margin-bottom: 80px;
+        }
+        
+        .product-item {
+            background: white;
+            border: 2px solid #E2E8F0;
+            border-radius: 20px;
+            padding: 12px 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        /* BARIS PERTAMA: Nama dan Kategori */
+        .product-row-1 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed #CBD5E0;
+        }
+        
+        .product-nama {
+            font-weight: bold;
+            font-size: 16px;
+            color: #0F4C5C;
+        }
+        
+        .product-kategori {
+            background: #E2E8F0;
+            padding: 3px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+        }
+        
+        /* BARIS KEDUA: Harga dan Aksi (SEJAJAR) */
+        .product-row-2 {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        /* Harga Ecer (Kiri) */
+        .harga-ecer-box {
+            flex: 1;
+            min-width: 100px;
+        }
+        
+        .harga-ecer {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1E7A5E;
+        }
+        
+        .harga-label {
+            font-size: 10px;
+            color: #666;
+        }
+        
+        /* Harga Grosir (Tengah) */
+        .harga-grosir-box {
+            flex: 1;
+            min-width: 100px;
+        }
+        
+        .harga-grosir {
+            font-size: 16px;
+            font-weight: bold;
+            color: #F18F01;
+        }
+        
+        /* Indikator + Keranjang (Kanan) */
+        .aksi-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        
+        .price-indicator {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: #F8F9FA;
+            border: 1px solid #CBD5E0;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        
+        .indicator-up {
+            color: #1E7A5E;
+            font-weight: bold;
+        }
+        
+        .indicator-down {
+            color: #E53E3E;
+            font-weight: bold;
+        }
+        
+        .indicator-arrow {
+            font-size: 14px;
+        }
+        
+        .cart-icon-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .cart-icon {
+            background: #0F4C5C;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid #F18F01;
+        }
+        
+        .cart-icon span {
+            font-size: 18px;
+            color: white;
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #F18F01;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            border: 2px solid white;
+        }
+        
+        /* BARIS KETIGA: Tanggal dan Agen */
+        .product-row-3 {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+            padding-top: 5px;
+            border-top: 1px dashed #CBD5E0;
+            font-size: 11px;
+            color: #999;
+        }
+        
+        /* HISTORY POPUP */
+        .history-popup {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            left: 0;
+            background: white;
+            border: 3px solid #0F4C5C;
+            border-radius: 20px;
+            margin-top: 5px;
+            padding: 15px;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .history-popup.show {
+            display: block;
+        }
+        
+        .history-title {
+            font-weight: bold;
+            color: #0F4C5C;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px dashed #CBD5E0;
+        }
+        
+        .history-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        
+        .history-row:last-child {
+            border-bottom: none;
+        }
+        
+        .history-date {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .history-price {
+            font-weight: bold;
+            color: #F18F01;
+        }
+        
+        .history-agen {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .history-diff-up {
+            color: #1E7A5E;
+            font-size: 11px;
+        }
+        
+        .history-diff-down {
+            color: #E53E3E;
+            font-size: 11px;
+        }
+        
+        .cart-summary {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            left: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            background: #0F4C5C;
+            color: white;
+            border-radius: 60px;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 2px solid #F18F01;
+            z-index: 1000;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-box {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.2s;
+            border: 3px solid #F18F01;
+        }
+        
+        .modal-overlay.show .modal-box {
+            transform: scale(1);
+        }
+        
+        .no-result {
+            text-align: center;
+            padding: 40px;
+            background: #EDF2F7;
+            border-radius: 25px;
+            color: #666;
+        }
+        
+        @media (max-width: 500px) {
+            .product-row-2 {
+                flex-wrap: wrap;
+            }
+            .harga-ecer-box, .harga-grosir-box {
+                min-width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="padding-bottom: 100px;">
+        <div class="page-header">
+            <a href="index.html" class="back-btn">◀</a>
+            <h1 class="page-title">🔍 CEK HARGA</h1>
+            <div style="width: 45px;"></div>
+        </div>
+
+        <div class="search-box-page">
+            <input type="text" id="searchInput" placeholder="Ketik nama barang..." autocomplete="off">
+            <button id="searchBtn">CARI</button>
+            <div id="suggestionBox" class="suggestion-box"></div>
+        </div>
+
+        <div class="filter-section" id="filterKategori">
+            <button class="filter-btn active" data-kategori="semua">Semua</button>
+        </div>
+
+        <div id="productList" class="product-list"></div>
+
+        <div id="cartSummary" class="cart-summary" style="display: none;">
+            <div class="cart-summary-left">
+                <div class="cart-summary-icon">🛒</div>
+                <div class="cart-summary-info">
+                    <h3>Total Belanja</h3>
+                    <p id="cartTotalItems">0 barang</p>
+                </div>
+            </div>
+            <div class="cart-summary-right">
+                <button onclick="window.location.href='rencana-belanja.html'">LIHAT</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-header-icon">🛒</div>
+                <h2>Tambah ke Belanja</h2>
+            </div>
+            <div id="modalProductName" class="modal-product-name">-</div>
+            <div class="modal-price">
+                <div class="label">Harga Grosir</div>
+                <div class="value" id="modalHargaGrosir">Rp 0</div>
+            </div>
+            <div class="modal-input-group">
+                <label>Jumlah beli</label>
+                <div class="modal-input">
+                    <input type="number" id="modalJumlah" value="1" min="1" step="1">
+                    <span id="modalSatuan">pcs</span>
+                </div>
+            </div>
+            <div class="modal-total">
+                <span>Total harga:</span>
+                <span id="modalTotal">Rp 0</span>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="tutupModal()">Batal</button>
+                <button class="modal-btn add" onclick="konfirmasiTambah()">Tambah</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="data.js"></script>
+    <script>
+        let cartItems = [];
+        let selectedBarang = null;
+        let selectedHargaGrosir = 0;
+        let selectedSatuanGrosir = '';
+        let suggestionTimeout = null;
+
+        function loadCart() {
+            const saved = localStorage.getItem('tokofariz_cart');
+            if (saved) {
+                cartItems = JSON.parse(saved);
+            }
+            updateCartSummary();
+        }
+
+        function saveCart() {
+            localStorage.setItem('tokofariz_cart', JSON.stringify(cartItems));
+            updateCartSummary();
+            updateAllBadges();
+        }
+
+        function updateCartSummary() {
+            const summary = document.getElementById('cartSummary');
+            const totalItems = document.getElementById('cartTotalItems');
+            
+            if (cartItems.length === 0) {
+                summary.style.display = 'none';
+            } else {
+                summary.style.display = 'flex';
+                totalItems.textContent = cartItems.length + ' barang';
+            }
+        }
+
+        function updateAllBadges() {
+            cartItems.forEach(item => {
+                const badge = document.getElementById(`badge-${item.barangId}`);
+                if (badge) {
+                    badge.textContent = item.qty;
+                    badge.style.display = 'flex';
+                }
+            });
+        }
+
+        function loadFilterKategori() {
+            const container = document.getElementById('filterKategori');
+            const kategoriSet = new Set();
+            daftarBarang.forEach(barang => {
+                if (barang.kategori) kategoriSet.add(barang.kategori);
+            });
+            const kategoriList = Array.from(kategoriSet).sort();
+            
+            kategoriList.forEach(kat => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.setAttribute('data-kategori', kat);
+                btn.textContent = kat;
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    tampilkanProduk();
+                });
+                container.appendChild(btn);
+            });
+        }
+
+        function showSuggestions() {
+            const input = document.getElementById('searchInput');
+            const keyword = input.value.toLowerCase().trim();
+            const suggestionBox = document.getElementById('suggestionBox');
+            
+            if (keyword.length < 1) {
+                suggestionBox.classList.remove('show');
+                return;
+            }
+            
+            const hasil = daftarBarang
+                .filter(barang => barang.nama.toLowerCase().includes(keyword))
+                .sort((a, b) => {
+                    const aStarts = a.nama.toLowerCase().startsWith(keyword);
+                    const bStarts = b.nama.toLowerCase().startsWith(keyword);
+                    if (aStarts && !bStarts) return -1;
+                    if (!aStarts && bStarts) return 1;
+                    return a.nama.length - b.nama.length;
+                })
+                .slice(0, 7);
+            
+            if (hasil.length === 0) {
+                suggestionBox.classList.remove('show');
+                return;
+            }
+            
+            let html = '';
+            hasil.forEach(barang => {
+                const nama = barang.nama;
+                const index = nama.toLowerCase().indexOf(keyword);
+                let namaDisplay = '';
+                
+                if (index >= 0) {
+                    namaDisplay = 
+                        nama.substring(0, index) +
+                        '<span style="background: #F18F01; color: white; padding: 2px 0;">' +
+                        nama.substring(index, index + keyword.length) +
+                        '</span>' +
+                        nama.substring(index + keyword.length);
+                } else {
+                    namaDisplay = nama;
+                }
+                
+                html += `
+                    <div class="suggestion-item" onclick="pilihSuggestion('${barang.nama}')">
+                        <span class="suggestion-nama">${namaDisplay}</span>
+                        <span class="suggestion-kategori">${barang.kategori || '-'}</span>
+                    </div>
+                `;
+            });
+            
+            suggestionBox.innerHTML = html;
+            suggestionBox.classList.add('show');
+        }
+
+        function pilihSuggestion(nama) {
+            document.getElementById('searchInput').value = nama;
+            document.getElementById('suggestionBox').classList.remove('show');
+            tampilkanProduk();
+        }
+
+        function cekPerubahanHarga(namaBarang, hargaSekarang) {
+            const semuaVersi = daftarBarang
+                .filter(b => b.nama === namaBarang)
+                .sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+            
+            if (semuaVersi.length <= 1) return null;
+            
+            const sebelumnya = semuaVersi[1];
+            const hargaSebelum = sebelumnya.modal / sebelumnya.jumlahAngka;
+            const selisih = hargaSekarang - hargaSebelum;
+            const persen = ((selisih / hargaSebelum) * 100).toFixed(1);
+            
+            return {
+                naik: selisih > 0,
+                turun: selisih < 0,
+                selisih: Math.abs(selisih),
+                persen: Math.abs(persen),
+                tanggalSebelum: sebelumnya.tanggal,
+                semuaVersi: semuaVersi
+            };
+        }
+
+        function toggleHistory(id) {
+            const popup = document.getElementById(`history-${id}`);
+            if (popup) {
+                popup.classList.toggle('show');
+            }
+        }
+
+        function tampilkanProduk() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            const kategoriActive = document.querySelector('.filter-btn.active')?.getAttribute('data-kategori') || 'semua';
+            
+            let hasil = daftarBarang;
+            
+            if (keyword) {
+                hasil = hasil.filter(barang => 
+                    barang.nama.toLowerCase().includes(keyword)
+                );
+            }
+            
+            if (kategoriActive !== 'semua') {
+                hasil = hasil.filter(barang => barang.kategori === kategoriActive);
+            }
+            
+            hasil.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+            
+            const container = document.getElementById('productList');
+            
+            if (hasil.length === 0) {
+                container.innerHTML = `<div class="no-result"><p>Tidak ada barang ditemukan</p></div>`;
+                return;
+            }
+            
+            let html = '';
+            hasil.forEach(barang => {
+                const hargaEcer = barang.modal / barang.totalUnit;
+                const hargaGrosir = barang.modal / barang.jumlahAngka;
+                
+                let satuanEcer = barang.isiSatuan || barang.jumlahSatuan || 'unit';
+                let satuanGrosir = barang.satuanBeli || 'kemasan';
+                
+                // Logic khusus
+                if (barang.nama.toLowerCase().includes('rokok')) {
+                    satuanEcer = 'batang';
+                    satuanGrosir = barang.satuanBeli === 'Renceng' ? 'slop' : 'bungkus';
+                }
+                if (barang.satuanBeli === 'Renceng' && !barang.nama.toLowerCase().includes('rokok')) {
+                    satuanEcer = 'pcs';
+                    satuanGrosir = 'renceng';
+                }
+                if (barang.satuanBeli === 'Karung') {
+                    satuanEcer = 'liter';
+                    satuanGrosir = 'karung';
+                }
+                if (barang.satuanBeli === 'Peti') {
+                    satuanEcer = 'butir';
+                    satuanGrosir = 'peti';
+                }
+                
+                const cartItem = cartItems.find(item => item.barangId === barang.id);
+                const perubahan = cekPerubahanHarga(barang.nama, hargaGrosir);
+                
+                html += `
+                    <div class="product-item" id="item-${barang.id}">
+                        <!-- BARIS 1: Nama dan Kategori -->
+                        <div class="product-row-1">
+                            <span class="product-nama">${barang.nama}</span>
+                            <span class="product-kategori">${barang.kategori || '-'}</span>
+                        </div>
+                        
+                        <!-- BARIS 2: Harga Ecer | Harga Grosir | Indikator + Keranjang (SEJAJAR) -->
+                        <div class="product-row-2">
+                            <div class="harga-ecer-box">
+                                <div class="harga-label">Eceran</div>
+                                <div class="harga-ecer">${formatRupiah(hargaEcer)} <span class="harga-satuan">/${satuanEcer}</span></div>
+                            </div>
+                            
+                            <div class="harga-grosir-box">
+                                <div class="harga-label">Grosir</div>
+                                <div class="harga-grosir">${formatRupiah(hargaGrosir)} <span class="harga-satuan">/${satuanGrosir}</span></div>
+                            </div>
+                            
+                            <div class="aksi-box">
+                                ${perubahan ? `
+                                    <div class="price-indicator" onclick="toggleHistory('${barang.id}')">
+                                        ${perubahan.naik ? `
+                                            <span class="indicator-arrow indicator-up">↑</span>
+                                            <span class="indicator-up">naik</span>
+                                        ` : perubahan.turun ? `
+                                            <span class="indicator-arrow indicator-down">↓</span>
+                                            <span class="indicator-down">turun</span>
+                                        ` : ''}
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="cart-icon-container">
+                                    <div class="cart-icon" onclick="bukaModal('${barang.id}', ${hargaGrosir}, '${satuanGrosir}')">
+                                        <span>🛒</span>
+                                    </div>
+                                    <div class="cart-badge" id="badge-${barang.id}" style="${cartItem ? 'display: flex;' : 'display: none;'}">
+                                        ${cartItem ? cartItem.qty : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- BARIS 3: Tanggal dan Agen -->
+                        <div class="product-row-3">
+                            <span>📅 ${formatTanggal(barang.tanggal)}</span>
+                            ${barang.agen ? `<span>🏪 ${barang.agen}</span>` : ''}
+                        </div>
+                        
+                        ${perubahan ? `
+                            <div class="history-popup" id="history-${barang.id}">
+                                <div class="history-title">📜 Riwayat Harga</div>
+                                ${perubahan.semuaVersi.map((v, i) => {
+                                    const hargaV = v.modal / v.jumlahAngka;
+                                    const diff = i > 0 ? hargaV - (perubahan.semuaVersi[i-1].modal / perubahan.semuaVersi[i-1].jumlahAngka) : 0;
+                                    return `
+                                        <div class="history-row">
+                                            <div>
+                                                <div class="history-date">${formatTanggal(v.tanggal)}</div>
+                                                <div class="history-agen">${v.agen || 'Agen'}</div>
+                                            </div>
+                                            <div>
+                                                <span class="history-price">${formatRupiah(hargaV)}</span>
+                                                ${i > 0 ? `
+                                                    ${diff > 0 ? 
+                                                        `<div class="history-diff-up">↑ ${formatRupiah(diff)}</div>` : 
+                                                        diff < 0 ? 
+                                                        `<div class="history-diff-down">↓ ${formatRupiah(Math.abs(diff))}</div>` : ''
+                                                    }
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function bukaModal(barangId, hargaGrosir, satuanGrosir) {
+            const barang = daftarBarang.find(b => b.id == barangId);
+            if (!barang) return;
+            
+            selectedBarang = barang;
+            selectedHargaGrosir = hargaGrosir;
+            selectedSatuanGrosir = satuanGrosir;
+            
+            document.getElementById('modalProductName').textContent = barang.nama;
+            document.getElementById('modalHargaGrosir').textContent = formatRupiah(hargaGrosir);
+            document.getElementById('modalSatuan').textContent = satuanGrosir;
+            document.getElementById('modalJumlah').value = 1;
+            hitungTotalModal();
+            
+            document.getElementById('modalOverlay').classList.add('show');
+        }
+
+        function hitungTotalModal() {
+            const jumlah = parseFloat(document.getElementById('modalJumlah').value) || 1;
+            const total = selectedHargaGrosir * jumlah;
+            document.getElementById('modalTotal').textContent = formatRupiah(total);
+        }
+
+        function tutupModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+        }
+
+        function konfirmasiTambah() {
+            if (!selectedBarang) return;
+            
+            const jumlah = parseFloat(document.getElementById('modalJumlah').value);
+            const satuanText = document.getElementById('modalSatuan').textContent;
+            
+            if (isNaN(jumlah) || jumlah <= 0) {
+                alert('Masukkan jumlah yang valid');
+                return;
+            }
+            
+            const totalHarga = selectedHargaGrosir * jumlah;
+            
+            const existingIndex = cartItems.findIndex(item => item.barangId === selectedBarang.id);
+            
+            if (existingIndex >= 0) {
+                cartItems[existingIndex].qty = jumlah;
+                cartItems[existingIndex].totalHarga = totalHarga;
+            } else {
+                cartItems.push({
+                    id: Date.now() + Math.random(),
+                    barangId: selectedBarang.id,
+                    nama: selectedBarang.nama,
+                    qty: jumlah,
+                    satuan: satuanText,
+                    hargaSatuan: selectedHargaGrosir,
+                    totalHarga: totalHarga,
+                    tanggal: selectedBarang.tanggal,
+                    agen: selectedBarang.agen
+                });
+            }
+            
+            saveCart();
+            tampilkanProduk();
+            tutupModal();
+        }
+
+        function formatRupiah(angka) {
+            return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+        }
+
+        function formatTanggal(tanggal) {
+            if (!tanggal) return '-';
+            const date = new Date(tanggal);
+            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCart();
+            loadFilterKategori();
+            
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            
+            searchBtn.addEventListener('click', function() {
+                tampilkanProduk();
+                document.getElementById('suggestionBox').classList.remove('show');
+            });
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    tampilkanProduk();
+                    document.getElementById('suggestionBox').classList.remove('show');
+                }
+            });
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(suggestionTimeout);
+                suggestionTimeout = setTimeout(showSuggestions, 200);
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !document.getElementById('suggestionBox').contains(e.target)) {
+                    document.getElementById('suggestionBox').classList.remove('show');
+                }
+            });
+            
+            document.getElementById('modalJumlah').addEventListener('input', hitungTotalModal);
+            tampilkanProduk();
+        });
+    </script>
+</body>
+</html>

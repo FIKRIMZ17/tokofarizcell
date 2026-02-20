@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>TOKO FARIZ CELL - Belanja Bapak</title>
+    
+    <!-- CEK LOGIN -->
+    <script>
+        if (localStorage.getItem('tokofariz_auth') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+    
+    <!-- LIBRARY PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Style tambahan untuk search di halaman utama */
+        .search-hero {
+            background: linear-gradient(145deg, #E6F0FA, #D4E4F5);
+            padding: 25px 20px;
+            border-radius: 30px;
+            margin-bottom: 25px;
+            border: 2px solid #0F4C5C;
+            box-shadow: 0 4px 12px rgba(15, 76, 92, 0.2);
+            position: relative;
+        }
+        
+        .search-hero h2 {
+            color: #0F4C5C;
+            font-size: 22px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 20px 15px;
+            font-size: 18px;
+            border: 3px solid #0F4C5C;
+            border-radius: 20px;
+            outline: none;
+            background: white;
+            font-weight: 500;
+        }
+        
+        .search-box input:focus {
+            border-color: #1E7A5E;
+            box-shadow: 0 0 0 3px rgba(30, 122, 94, 0.3);
+        }
+        
+        .search-btn {
+            background: #F18F01;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 0 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid #C87400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .search-btn:active {
+            transform: scale(0.95);
+            background: #C87400;
+        }
+        
+        .suggestion-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 3px solid #0F4C5C;
+            border-radius: 20px;
+            margin-top: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .suggestion-box.show {
+            display: block;
+        }
+        
+        .suggestion-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #E2E8F0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .suggestion-item:hover {
+            background: #E6F0FA;
+        }
+        
+        .suggestion-nama {
+            font-weight: bold;
+            color: #0F4C5C;
+        }
+        
+        .suggestion-kategori {
+            font-size: 12px;
+            color: #F18F01;
+            background: #FEF5E7;
+            padding: 3px 10px;
+            border-radius: 30px;
+        }
+        
+        .duo-tombol {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .tombol-utama {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 22px 10px;
+            border-radius: 25px;
+            text-decoration: none;
+            color: white;
+            min-height: 130px;
+            justify-content: center;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+            font-weight: bold;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .tombol-utama:first-child {
+            background: #1E7A5E;
+        }
+        
+        .tombol-utama:last-child {
+            background: #0F4C5C;
+        }
+        
+        .tombol-utama:active {
+            transform: scale(0.97);
+        }
+        
+        .ikon {
+            font-size: 44px;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 5px rgba(0,0,0,0.3);
+        }
+        
+        .teks {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.4);
+        }
+        
+        .keterangan {
+            font-size: 13px;
+            opacity: 1;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.2);
+            padding: 3px 10px;
+            border-radius: 30px;
+        }
+        
+        /* QUICK ACCESS - DIPERKECIL AGAR MUAT 5 TOMBOL */
+        .quick-access {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            gap: 5px;
+            flex-wrap: nowrap;
+        }
+        
+        .quick-btn {
+            background: #E2E8F0;
+            padding: 8px 4px;
+            border-radius: 30px;
+            text-decoration: none;
+            color: #0F4C5C;
+            font-weight: 600;
+            font-size: 13px;
+            flex: 1;
+            text-align: center;
+            border: 2px solid #0F4C5C;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .quick-btn.special {
+            background: #1E7A5E;
+            color: white;
+            border-color: #F18F01;
+        }
+        
+        .sering-dicari-section {
+            margin-bottom: 25px;
+        }
+        
+        .sering-dicari-section h3 {
+            color: #0F4C5C;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 600;
+            border-left: 5px solid #F18F01;
+            padding-left: 12px;
+        }
+        
+        .populer-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .populer-item {
+            background: #FEF5E7;
+            padding: 12px 22px;
+            border-radius: 40px;
+            border: 2px solid #1E7A5E;
+            color: #1E7A5E;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .mini-keranjang {
+            background: #F8F9FA;
+            border-radius: 25px;
+            padding: 18px;
+            margin-bottom: 25px;
+            border: 2px solid #1E7A5E;
+        }
+        
+        .mini-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: bold;
+            color: #0F4C5C;
+            font-size: 18px;
+            padding-bottom: 5px;
+            border-bottom: 2px dashed #1E7A5E;
+        }
+        
+        .lihat-link {
+            color: #F18F01;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .kosong {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .baru-section h3 {
+            color: #0F4C5C;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 600;
+            border-left: 5px solid #F18F01;
+            padding-left: 12px;
+        }
+        
+        .baru-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .baru-item {
+            background: white;
+            border: 2px solid #CBD5E0;
+            border-radius: 18px;
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 18px;
+            border-top: 2px solid #CBD5E0;
+            color: #4A5568;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .header-simple {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #0F4C5C;
+        }
+        
+        .header-simple h1 {
+            color: #0F4C5C;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .date {
+            color: #2D3748;
+            font-size: 14px;
+            background: #E2E8F0;
+            padding: 6px 12px;
+            border-radius: 25px;
+            font-weight: 500;
+        }
+
+        /* MODAL PRICELIST */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-box {
+            background: white;
+            width: 95%;
+            max-width: 600px;
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.2s;
+            border: 3px solid #F18F01;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-overlay.show .modal-box {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed #CBD5E0;
+        }
+        
+        .modal-header-icon {
+            background: #0F4C5C;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: white;
+        }
+        
+        .modal-header h2 {
+            color: #0F4C5C;
+            font-size: 20px;
+            flex: 1;
+            margin: 0;
+        }
+        
+        .pricelist-search {
+            margin-bottom: 15px;
+        }
+        
+        .pricelist-search input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #CBD5E0;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+        
+        .pricelist-items {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #E2E8F0;
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .pricelist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        
+        .pricelist-item:last-child {
+            border-bottom: none;
+        }
+        
+        .pricelist-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .pricelist-item-info {
+            flex: 2;
+        }
+        
+        .pricelist-item-nama {
+            font-weight: bold;
+            color: #0F4C5C;
+            font-size: 14px;
+        }
+        
+        .pricelist-item-detail {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .pricelist-item-harga {
+            text-align: right;
+            min-width: 100px;
+        }
+        
+        .pricelist-item-modal {
+            font-size: 12px;
+            color: #F18F01;
+            font-weight: bold;
+        }
+        
+        .pricelist-item input[type="number"] {
+            width: 90px;
+            padding: 6px;
+            border: 2px solid #CBD5E0;
+            border-radius: 10px;
+            text-align: right;
+        }
+        
+        .select-all-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .select-all-bar label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: bold;
+            color: #0F4C5C;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .modal-btn.cancel {
+            background: #E2E8F0;
+            color: #666;
+        }
+        
+        .modal-btn.generate {
+            background: #1E7A5E;
+            color: white;
+        }
+        
+        .modal-btn.pdf {
+            background: #F18F01;
+            color: white;
+        }
+        
+        .total-selected {
+            font-size: 13px;
+            color: #0F4C5C;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header-simple">
+            <h1>🏠 TOKO FARIZ CELL</h1>
+            <p class="date" id="tanggalDisplay"></p>
+        </div>
+
+        <!-- SEARCH HERO -->
+        <div class="search-hero">
+            <h2>🔍 Mau cek harga apa, Pak?</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Ketik nama barang..." autocomplete="off">
+                <button id="searchBtn" class="search-btn">CARI</button>
+                <div id="suggestionBox" class="suggestion-box"></div>
+            </div>
+        </div>
+
+        <!-- DUO TOMBOL UTAMA -->
+        <div class="duo-tombol">
+            <a href="rencana-belanja.html" class="tombol-utama">
+                <span class="ikon">🛒</span>
+                <span class="teks">RENCANA BELANJA</span>
+                <span class="keterangan">Lihat keranjang & total</span>
+            </a>
+            <a href="tambah.html" class="tombol-utama">
+                <span class="ikon">➕</span>
+                <span class="teks">TAMBAH BARANG</span>
+                <span class="keterangan">Input modal baru</span>
+            </a>
+        </div>
+
+        <!-- QUICK ACCESS (DENGAN TOMBOL PRICELIST) -->
+        <div class="quick-access">
+            <a href="daftar-barang.html" class="quick-btn">📋 Barang</a>
+            <a href="cek-harga.html" class="quick-btn">🔍 Cek Harga</a>
+            <a href="#" class="quick-btn special" onclick="bukaModalPricelist(); return false;">📄 Pricelist</a>
+            <a href="grafik.html" class="quick-btn">📊 Statistik</a>
+            <a href="kelola-kategori.html" class="quick-btn">🏷️ Kategori</a>
+        </div>
+
+        <!-- POPULER -->
+        <div class="sering-dicari-section">
+            <h3>🔥 Pencarian Populer</h3>
+            <div id="populerList" class="populer-list"></div>
+        </div>
+
+        <!-- MINI KERANJANG -->
+        <div class="mini-keranjang">
+            <div class="mini-header">
+                <span>🛒 Keranjang Belanja</span>
+                <a href="rencana-belanja.html" class="lihat-link">Lihat ➔</a>
+            </div>
+            <div id="miniRingkasan">
+                <p class="kosong">Belum ada barang</p>
+            </div>
+        </div>
+
+        <!-- BARANG BARU -->
+        <div class="baru-section">
+            <h3>📦 Barang Baru</h3>
+            <div id="baruList" class="baru-list"></div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>Untuk Bapak tersayang - Belanja jadi mudah ❤️</p>
+        </div>
+    </div>
+
+    <!-- MODAL PRICELIST -->
+    <div id="modalPricelist" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-header-icon">📄</div>
+                <h2>Buat Pricelist PDF</h2>
+            </div>
+            
+            <!-- SEARCH UNTUK FILTER BARANG -->
+            <div class="pricelist-search">
+                <input type="text" id="pricelistSearch" placeholder="Cari barang..." onkeyup="filterPricelistItems()">
+            </div>
+            
+            <!-- SELECT ALL / DESELECT ALL -->
+            <div class="select-all-bar">
+                <label>
+                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()"> Pilih Semua
+                </label>
+                <span id="selectedCount" class="total-selected">0 barang dipilih</span>
+            </div>
+            
+            <!-- DAFTAR BARANG (AKAN DIISI JAVASCRIPT) -->
+            <div id="pricelistItems" class="pricelist-items"></div>
+            
+            <!-- TOMBOL AKSI -->
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="tutupModalPricelist()">Batal</button>
+                <button class="modal-btn pdf" onclick="generatePDF()">📄 Buat PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="data.js"></script>
+    <script>
+        // ==================== VARIABEL ====================
+        let suggestionTimeout = null;
+        let cartItems = [];
+        let pricelistItems = []; // Untuk menyimpan data yang akan ditampilkan di modal
+
+        // ==================== LOAD CART ====================
+        function loadCart() {
+            const saved = localStorage.getItem('tokofariz_cart');
+            if (saved) {
+                cartItems = JSON.parse(saved);
+            }
+        }
+
+        // ==================== TANGGAL ====================
+        function tampilkanTanggal() {
+            const tanggalSpan = document.getElementById('tanggalDisplay');
+            if (tanggalSpan) {
+                const today = new Date();
+                const options = { day: 'numeric', month: 'long', year: 'numeric' };
+                tanggalSpan.textContent = today.toLocaleDateString('id-ID', options);
+            }
+        }
+
+        // ==================== SEARCH SUGGESTION ====================
+        function showSuggestions() {
+            const input = document.getElementById('searchInput');
+            const keyword = input.value.toLowerCase().trim();
+            const suggestionBox = document.getElementById('suggestionBox');
+            
+            if (keyword.length < 1) {
+                suggestionBox.classList.remove('show');
+                return;
+            }
+            
+            const hasil = daftarBarang
+                .filter(barang => barang.nama.toLowerCase().includes(keyword))
+                .sort((a, b) => {
+                    const aStarts = a.nama.toLowerCase().startsWith(keyword);
+                    const bStarts = b.nama.toLowerCase().startsWith(keyword);
+                    if (aStarts && !bStarts) return -1;
+                    if (!aStarts && bStarts) return 1;
+                    return a.nama.length - b.nama.length;
+                })
+                .slice(0, 7);
+            
+            if (hasil.length === 0) {
+                suggestionBox.classList.remove('show');
+                return;
+            }
+            
+            let html = '';
+            hasil.forEach(barang => {
+                const nama = barang.nama;
+                const index = nama.toLowerCase().indexOf(keyword);
+                let namaDisplay = '';
+                
+                if (index >= 0) {
+                    namaDisplay = 
+                        nama.substring(0, index) +
+                        '<span style="background: #F18F01; color: white; padding: 2px 0;">' +
+                        nama.substring(index, index + keyword.length) +
+                        '</span>' +
+                        nama.substring(index + keyword.length);
+                } else {
+                    namaDisplay = nama;
+                }
+                
+                html += `
+                    <div class="suggestion-item" onclick="pilihSuggestion('${barang.nama}')">
+                        <span class="suggestion-nama">${namaDisplay}</span>
+                        <span class="suggestion-kategori">${barang.kategori || '-'}</span>
+                    </div>
+                `;
+            });
+            
+            suggestionBox.innerHTML = html;
+            suggestionBox.classList.add('show');
+        }
+
+        function pilihSuggestion(nama) {
+            window.location.href = `cek-harga.html?cari=${encodeURIComponent(nama)}`;
+        }
+
+        function cariBarang() {
+            const keyword = document.getElementById('searchInput').value.trim();
+            if (keyword) {
+                window.location.href = `cek-harga.html?cari=${encodeURIComponent(keyword)}`;
+            }
+        }
+
+        // ==================== MINI KERANJANG ====================
+        function updateMiniKeranjang() {
+            const mini = document.getElementById('miniRingkasan');
+            if (!mini) return;
+            
+            if (!cartItems || cartItems.length === 0) {
+                mini.innerHTML = '<p class="kosong">Belum ada barang</p>';
+                return;
+            }
+            
+            let total = 0;
+            let html = '<ul style="list-style: none; padding: 0;">';
+            
+            cartItems.slice(0, 3).forEach(item => {
+                total += item.totalHarga || 0;
+                html += `<li style="margin-bottom: 5px;">• ${item.nama} (${item.qty || 0} ${item.satuan || ''})</li>`;
+            });
+            
+            if (cartItems.length > 3) {
+                html += `<li>...dan ${cartItems.length - 3} lainnya</li>`;
+            }
+            
+            html += `<li style="font-weight: bold; margin-top: 8px;">Total: ${formatRupiah(total)}</li>`;
+            html += '</ul>';
+            
+            mini.innerHTML = html;
+        }
+
+        // ==================== BARANG BARU ====================
+        function tampilkanBarangTerbaru() {
+            const container = document.getElementById('baruList');
+            if (!container) return;
+            
+            const terbaru = [...daftarBarang].reverse().slice(0, 3);
+            
+            if (terbaru.length === 0) {
+                container.innerHTML = '<p class="kosong">Belum ada barang</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            terbaru.forEach(barang => {
+                const hargaSatuan = barang.modal / barang.totalUnit;
+                const satuan = barang.isiSatuan || barang.jumlahSatuan || 'unit';
+                
+                const item = document.createElement('div');
+                item.className = 'baru-item';
+                item.innerHTML = `
+                    <span><strong>${barang.nama}</strong></span>
+                    <span style="color: #F18F01;">${formatRupiah(hargaSatuan)}/${satuan}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // ==================== POPULER ====================
+        function tampilkanPopuler() {
+            const container = document.getElementById('populerList');
+            if (!container) return;
+            
+            const populer = daftarBarang.slice(0, 6).map(b => b.nama.split(' ')[0]);
+            
+            const defaultPopuler = ['Beras', 'Gula', 'Minyak', 'Telur', 'Mie', 'Kopi'];
+            const finalPopuler = populer.length > 0 ? populer : defaultPopuler;
+            
+            container.innerHTML = '';
+            finalPopuler.slice(0, 6).forEach(item => {
+                const span = document.createElement('span');
+                span.className = 'populer-item';
+                span.textContent = item;
+                span.onclick = () => {
+                    window.location.href = `cek-harga.html?cari=${encodeURIComponent(item)}`;
+                };
+                container.appendChild(span);
+            });
+        }
+
+        // ==================== FORMAT RUPIAH ====================
+        function formatRupiah(angka) {
+            if (!angka) return 'Rp 0';
+            return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+        }
+
+        // ==================== MODAL PRICELIST ====================
+
+        // BUKA MODAL PRICELIST
+        function bukaModalPricelist() {
+            // Load data barang ke modal
+            loadPricelistItems();
+            document.getElementById('modalPricelist').classList.add('show');
+        }
+
+        // TUTUP MODAL PRICELIST
+        function tutupModalPricelist() {
+            document.getElementById('modalPricelist').classList.remove('show');
+        }
+
+        // LOAD DATA BARANG KE MODAL
+        function loadPricelistItems() {
+            const container = document.getElementById('pricelistItems');
+            
+            if (!daftarBarang || daftarBarang.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">Belum ada data barang</p>';
+                return;
+            }
+            
+            // Ambil semua barang unik berdasarkan nama terbaru
+            const barangUnik = new Map();
+            
+            // Urutkan dari terbaru
+            const sortedBarang = [...daftarBarang].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+            
+            sortedBarang.forEach(barang => {
+                if (!barangUnik.has(barang.nama)) {
+                    barangUnik.set(barang.nama, barang);
+                }
+            });
+            
+            // Konversi ke array dan urutkan berdasarkan nama
+            pricelistItems = Array.from(barangUnik.values()).sort((a, b) => a.nama.localeCompare(b.nama));
+            
+            renderPricelistItems();
+        }
+
+        // RENDER DAFTAR BARANG DI MODAL
+        function renderPricelistItems() {
+            const container = document.getElementById('pricelistItems');
+            const searchKeyword = document.getElementById('pricelistSearch')?.value.toLowerCase().trim() || '';
+            
+            // Filter berdasarkan pencarian
+            let filteredItems = pricelistItems;
+            if (searchKeyword) {
+                filteredItems = pricelistItems.filter(item => 
+                    item.nama.toLowerCase().includes(searchKeyword) ||
+                    (item.kategori && item.kategori.toLowerCase().includes(searchKeyword))
+                );
+            }
+            
+            if (filteredItems.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">Tidak ada barang</p>';
+                document.getElementById('selectedCount').textContent = '0 barang dipilih';
+                return;
+            }
+            
+            let html = '';
+            filteredItems.forEach((barang, index) => {
+                const hargaSatuan = barang.modal / barang.totalUnit;
+                const satuan = barang.isiSatuan || barang.jumlahSatuan || 'unit';
+                
+                html += `
+                    <div class="pricelist-item" data-index="${index}">
+                        <input type="checkbox" class="item-checkbox" data-nama="${barang.nama}" data-modal="${formatRupiah(hargaSatuan)}" data-satuan="${satuan}" onchange="updateSelectedCount()">
+                        <div class="pricelist-item-info">
+                            <div class="pricelist-item-nama">${barang.nama}</div>
+                            <div class="pricelist-item-detail">${barang.kategori || '-'} | ${barang.agen || '-'}</div>
+                        </div>
+                        <div class="pricelist-item-harga">
+                            <div class="pricelist-item-modal">Modal: ${formatRupiah(hargaSatuan)}/${satuan}</div>
+                            <input type="number" class="item-harga-jual" placeholder="Harga jual" min="0" step="500" disabled>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            updateSelectedCount();
+            
+            // Reset checkbox select all
+            document.getElementById('selectAllCheckbox').checked = false;
+        }
+
+        // FILTER PRICELIST ITEMS
+        function filterPricelistItems() {
+            renderPricelistItems();
+        }
+
+        // TOGGLE SELECT ALL
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAllCheckbox').checked;
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll;
+                
+                // Enable/disable input harga
+                const itemDiv = cb.closest('.pricelist-item');
+                const hargaInput = itemDiv.querySelector('.item-harga-jual');
+                hargaInput.disabled = !selectAll;
+                if (selectAll) {
+                    hargaInput.focus();
+                } else {
+                    hargaInput.value = '';
+                }
+            });
+            
+            updateSelectedCount();
+        }
+
+        // UPDATE JUMLAH YANG DIPILIH
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll('.item-checkbox:checked');
+            const count = checkboxes.length;
+            document.getElementById('selectedCount').textContent = count + ' barang dipilih';
+            
+            // Enable/disable input harga untuk checkbox yang dipilih
+            document.querySelectorAll('.item-checkbox').forEach(cb => {
+                const itemDiv = cb.closest('.pricelist-item');
+                const hargaInput = itemDiv.querySelector('.item-harga-jual');
+                if (cb.checked) {
+                    hargaInput.disabled = false;
+                } else {
+                    hargaInput.disabled = true;
+                    hargaInput.value = '';
+                }
+            });
+        }
+
+        // GENERATE PDF
+        function generatePDF() {
+            const checkboxes = document.querySelectorAll('.item-checkbox:checked');
+            
+            if (checkboxes.length === 0) {
+                alert('Pilih minimal 1 barang untuk pricelist');
+                return;
+            }
+            
+            // Kumpulkan data yang dipilih
+            const selectedItems = [];
+            let hasEmptyPrice = false;
+            
+            checkboxes.forEach(cb => {
+                const itemDiv = cb.closest('.pricelist-item');
+                const nama = cb.getAttribute('data-nama');
+                const modal = cb.getAttribute('data-modal');
+                const satuan = cb.getAttribute('data-satuan');
+                const hargaJual = itemDiv.querySelector('.item-harga-jual').value;
+                
+                if (!hargaJual || hargaJual <= 0) {
+                    hasEmptyPrice = true;
+                    return;
+                }
+                
+                selectedItems.push({
+                    nama: nama,
+                    modal: modal,
+                    hargaJual: 'Rp ' + parseInt(hargaJual).toLocaleString('id-ID'),
+                    satuan: satuan
+                });
+            });
+            
+            if (hasEmptyPrice) {
+                alert('Semua barang yang dipilih harus diisi harga jualnya');
+                return;
+            }
+            
+            // Buat PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Header
+            doc.setFontSize(18);
+            doc.setTextColor(15, 76, 92); // #0F4C5C
+            doc.text('TOKO FARIZ CELL', 14, 20);
+            
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Daftar Harga Jual', 14, 30);
+            
+            // Tanggal
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Tanggal: ' + dateStr, 14, 38);
+            
+            // Table
+            doc.autoTable({
+                startY: 45,
+                head: [['Nama Barang', 'Modal', 'Harga Jual', 'Satuan']],
+                body: selectedItems.map(item => [item.nama, item.modal, item.hargaJual, item.satuan]),
+                theme: 'striped',
+                headStyles: {
+                    fillColor: [30, 122, 94], // #1E7A5E
+                    textColor: 255,
+                    fontSize: 11
+                },
+                columnStyles: {
+                    0: { cellWidth: 70 },
+                    1: { cellWidth: 35, halign: 'right' },
+                    2: { cellWidth: 35, halign: 'right' },
+                    3: { cellWidth: 30, halign: 'center' }
+                }
+            });
+            
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(10);
+                doc.setTextColor(150, 150, 150);
+                doc.text('Harga dapat berubah sewaktu-waktu', 14, doc.internal.pageSize.height - 10);
+            }
+            
+            // Download PDF
+            doc.save('pricelist_tokofariz_' + today.toISOString().slice(0,10) + '.pdf');
+            
+            // Tutup modal
+            tutupModalPricelist();
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCart();
+            tampilkanTanggal();
+            updateMiniKeranjang();
+            tampilkanBarangTerbaru();
+            tampilkanPopuler();
+            
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const suggestionBox = document.getElementById('suggestionBox');
+            
+            searchBtn.addEventListener('click', cariBarang);
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    cariBarang();
+                }
+            });
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(suggestionTimeout);
+                suggestionTimeout = setTimeout(showSuggestions, 200);
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !suggestionBox.contains(e.target)) {
+                    suggestionBox.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>🛒 Rencana Belanja - TOKO FARIZ CELL</title>
+    
+    <!-- CEK LOGIN -->
+    <script>
+        if (localStorage.getItem('tokofariz_auth') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* TAMPILAN SAMA PERSIS */
+        .cart-item {
+            background: white;
+            border: 2px solid #E2E8F0;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        
+        .cart-item-left {
+            flex: 2;
+            min-width: 200px;
+        }
+        
+        .cart-item-left h3 {
+            color: #0F4C5C;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+        
+        .cart-item-left p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .cart-item-right {
+            text-align: right;
+            min-width: 150px;
+        }
+        
+        .cart-item-harga {
+            font-size: 20px;
+            font-weight: bold;
+            color: #F18F01;
+            margin-bottom: 5px;
+        }
+        
+        .qty-control {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .qty-btn {
+            background: #E2E8F0;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qty-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .qty-value {
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        
+        .btn-cek-harga {
+            background: #F18F01;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .btn-hapus {
+            background: #E53E3E;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .total-section {
+            background: #0F4C5C;
+            color: white;
+            border-radius: 25px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .total-section h2 {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .total-section .total-nilai {
+            font-size: 36px;
+            font-weight: bold;
+            color: #F18F01;
+        }
+        
+        .btn-kosongkan {
+            background: #718096;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 15px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .btn-refresh {
+            background: #F18F01;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 12px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            margin-bottom: 15px;
+            border: 2px solid #0F4C5C;
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: 50px 20px;
+            background: #EDF2F7;
+            border-radius: 25px;
+        }
+        
+        .btn-belanja {
+            background: #1E7A5E;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+        }
+        
+        .success-message {
+            background: #C6F6D5;
+            color: #22543D;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .error-message {
+            background: #FEEBC8;
+            color: #7B341E;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <a href="index.html" class="back-btn">◀</a>
+            <h1 class="page-title">🛒 RENCANA BELANJA</h1>
+            <div style="width: 45px;"></div>
+        </div>
+
+        <!-- PESAN -->
+        <div id="successMessage" class="success-message"></div>
+        <div id="errorMessage" class="error-message"></div>
+
+        <!-- TOMBOL REFRESH -->
+        <button class="btn-refresh" onclick="refreshCart()">🔄 Refresh Keranjang</button>
+
+        <!-- DAFTAR KERANJANG -->
+        <div id="cartList"></div>
+
+        <!-- EMPTY CART -->
+        <div id="emptyCart" class="empty-cart" style="display: none;">
+            <p style="font-size: 48px;">🛒</p>
+            <p>Belum ada barang di keranjang</p>
+            <a href="cek-harga.html" class="btn-belanja">🔍 Cari Barang</a>
+        </div>
+
+        <!-- SUMMARY SECTION -->
+        <div id="cartSummarySection" style="display: none;">
+            <div class="total-section">
+                <h2>TOTAL MODAL BELANJA</h2>
+                <p class="total-nilai" id="grandTotal">Rp 0</p>
+                <p style="margin-top: 10px; font-size: 14px;">*Jangan lupa bawa uang pas</p>
+            </div>
+            
+            <button class="btn-kosongkan" onclick="clearCart()">🗑️ KOSONGKAN KERANJANG</button>
+        </div>
+
+        <div class="footer">
+            <p>Total belanja ke agen, Pak</p>
+        </div>
+    </div>
+
+    <script type="module" src="data.js"></script>
+    <script>
+        // ==================== VARIABEL GLOBAL ====================
+        let cartItems = [];
+
+        // ==================== FUNGSI DASAR ====================
+        
+        // Load keranjang dari localStorage
+        function loadCart() {
+            try {
+                const saved = localStorage.getItem('tokofariz_cart');
+                if (saved) {
+                    cartItems = JSON.parse(saved);
+                    // Validasi
+                    if (!Array.isArray(cartItems)) cartItems = [];
+                    
+                    // Filter item yang valid dan beri ID jika perlu
+                    cartItems = cartItems.filter(item => item && typeof item === 'object');
+                    
+                    // Generate ID unik untuk setiap item
+                    cartItems = cartItems.map((item, index) => {
+                        if (!item.id) {
+                            item.id = 'cart_' + Date.now() + '_' + index + '_' + Math.random().toString(36).substr(2, 5);
+                        }
+                        // Pastikan properti penting ada
+                        item.nama = item.nama || 'Tanpa Nama';
+                        item.qty = item.qty || 1;
+                        item.satuan = item.satuan || 'pcs';
+                        item.hargaSatuan = item.hargaSatuan || 0;
+                        item.totalHarga = item.hargaSatuan * item.qty;
+                        return item;
+                    });
+                } else {
+                    cartItems = [];
+                }
+                saveCart();
+            } catch (e) {
+                console.error('Error loadCart:', e);
+                cartItems = [];
+            }
+        }
+
+        // Simpan keranjang ke localStorage
+        function saveCart() {
+            try {
+                localStorage.setItem('tokofariz_cart', JSON.stringify(cartItems));
+                return true;
+            } catch (e) {
+                console.error('Error saveCart:', e);
+                return false;
+            }
+        }
+
+        // Refresh tampilan
+        function renderCart() {
+            const cartList = document.getElementById('cartList');
+            const emptyCart = document.getElementById('emptyCart');
+            const summarySection = document.getElementById('cartSummarySection');
+            
+            if (!cartItems || cartItems.length === 0) {
+                cartList.innerHTML = '';
+                emptyCart.style.display = 'block';
+                summarySection.style.display = 'none';
+                return;
+            }
+            
+            emptyCart.style.display = 'none';
+            summarySection.style.display = 'block';
+            
+            let html = '';
+            let total = 0;
+            
+            cartItems.forEach((item, index) => {
+                if (!item) return;
+                
+                // Gunakan index sebagai fallback ID
+                const itemId = item.id || 'idx_' + index;
+                const displayId = 'item_' + index; // ID untuk HTML
+                
+                total += item.totalHarga || 0;
+                
+                html += `
+                    <div class="cart-item" id="cart-${displayId}">
+                        <div class="cart-item-left">
+                            <h3>${item.nama || 'Tanpa Nama'}</h3>
+                            <p>${item.qty || 1} ${item.satuan || 'pcs'} × ${formatRupiah(item.hargaSatuan || 0)}</p>
+                        </div>
+                        <div class="cart-item-right">
+                            <div class="cart-item-harga">${formatRupiah(item.totalHarga || 0)}</div>
+                            
+                            <!-- TOMBOL EDIT JUMLAH -->
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="updateQty('${itemId}', ${index}, -1)">−</button>
+                                <span class="qty-value">${item.qty || 1}</span>
+                                <button class="qty-btn" onclick="updateQty('${itemId}', ${index}, 1)">+</button>
+                            </div>
+                            
+                            <!-- TOMBOL AKSI -->
+                            <div class="action-buttons">
+                                <button class="btn-cek-harga" onclick="searchItem('${item.nama || ''}')">🔍 Cek Harga</button>
+                                <button class="btn-hapus" onclick="deleteItem(${index})">✖ Hapus</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            cartList.innerHTML = html;
+            document.getElementById('grandTotal').textContent = formatRupiah(total);
+        }
+
+        // ==================== FUNGSI UTAMA ====================
+
+        // Update jumlah berdasarkan INDEX (paling stabil)
+        function updateQty(id, index, delta) {
+            // Cek index valid
+            if (index < 0 || index >= cartItems.length) {
+                showError('Item tidak ditemukan (index)');
+                return;
+            }
+            
+            const item = cartItems[index];
+            
+            // Validasi item
+            if (!item) {
+                showError('Item tidak valid');
+                return;
+            }
+            
+            const newQty = (item.qty || 1) + delta;
+            
+            if (newQty < 1) {
+                // Tanya hapus
+                if (confirm('Hapus item ini?')) {
+                    deleteItem(index);
+                }
+                return;
+            }
+            
+            // Update
+            item.qty = newQty;
+            item.totalHarga = (item.hargaSatuan || 0) * newQty;
+            
+            // Simpan dan refresh
+            saveCart();
+            renderCart();
+            showSuccess('Jumlah diupdate');
+        }
+
+        // Hapus item berdasarkan INDEX
+        function deleteItem(index) {
+            // Cek index valid
+            if (index < 0 || index >= cartItems.length) {
+                showError('Item tidak ditemukan');
+                return;
+            }
+            
+            const item = cartItems[index];
+            const itemName = item ? item.nama : 'Item';
+            
+            if (!confirm(`Hapus ${itemName} dari keranjang?`)) return;
+            
+            // Hapus berdasarkan index
+            cartItems.splice(index, 1);
+            
+            // Simpan dan refresh
+            saveCart();
+            renderCart();
+            showSuccess('✅ Item dihapus');
+        }
+
+        // Cari barang (redirect)
+        function searchItem(nama) {
+            if (nama && nama !== 'Tanpa Nama') {
+                window.location.href = `cek-harga.html?cari=${encodeURIComponent(nama)}`;
+            } else {
+                window.location.href = 'cek-harga.html';
+            }
+        }
+
+        // Refresh keranjang
+        function refreshCart() {
+            loadCart();
+            renderCart();
+            showSuccess('✅ Keranjang direfresh');
+        }
+
+        // Kosongkan semua
+        function clearCart() {
+            if (cartItems.length === 0) return;
+            
+            if (confirm('Yakin kosongkan semua rencana belanja?')) {
+                cartItems = [];
+                saveCart();
+                renderCart();
+                showSuccess('✅ Keranjang dikosongkan');
+            }
+        }
+
+        // ==================== FUNGSI BANTU ====================
+
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 2000);
+        }
+        
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 2000);
+        }
+
+        function formatRupiah(angka) {
+            if (!angka) return 'Rp 0';
+            return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCart();
+            renderCart();
+        });
+    </script>
+</body>
+</html>
